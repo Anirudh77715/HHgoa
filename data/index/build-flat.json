@@ -1,0 +1,32 @@
+{
+  "model": "BAAI/bge-small-en-v1.5",
+  "indexes": [
+    {
+      "strategy": "structural",
+      "kind": "flat",
+      "n_vectors": 33,
+      "dim": 384,
+      "embed_total_ms": 31210.7,
+      "embed_per_chunk_ms": 945.78,
+      "path": "data\\index\\flat\\structural"
+    },
+    {
+      "strategy": "recursive",
+      "kind": "flat",
+      "n_vectors": 55,
+      "dim": 384,
+      "embed_total_ms": 14827.3,
+      "embed_per_chunk_ms": 269.59,
+      "path": "data\\index\\flat\\recursive"
+    },
+    {
+      "strategy": "parent_child",
+      "kind": "flat",
+      "n_vectors": 92,
+      "dim": 384,
+      "embed_total_ms": 16103.7,
+      "embed_per_chunk_ms": 175.04,
+      "path": "data\\index\\flat\\parent_child"
+    }
+  ]
+}

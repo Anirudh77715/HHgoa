@@ -1,0 +1,333 @@
+# Labelled evaluation set for retrieval.
+#
+# Latency alone proves nothing: an index that returns garbage in 2ms is fast
+# and useless. Every query here carries a GOLD LABEL (which doc actually
+# answers it) so the benchmark reports recall@k alongside p50/p70/p100. That
+# is the difference between "our retrieval is fast" and "our retrieval is
+# correct, and here is how fast."
+#
+# expect:
+#   answer  -> retrieval should surface at least one gold doc in top-k
+#   refuse  -> the corpus does NOT contain the answer; the guardrail must fire
+#              rather than the model improvising
+#
+# gold: doc_ids, any one of which counts as a hit (several questions are
+#       legitimately answered by more than one source).
+#
+# Categories exist so the report can show WHERE a strategy wins, not just an
+# average that hides the interesting variance.
+
+- id: q001
+  query: when does registration begin
+  category: timeline_direct
+  expect: answer
+  gold: [timeline-00]
+
+- id: q002
+  query: what is the last day to register
+  category: timeline_direct
+  expect: answer
+  gold: [timeline-08]
+
+- id: q003
+  query: when is the residency in Goa
+  category: timeline_direct
+  expect: answer
+  gold: [timeline-09, terms-02]
+
+- id: q004
+  query: when do open trials start
+  category: timeline_direct
+  expect: answer
+  gold: [timeline-01]
+
+- id: q005
+  query: when are alpha selections happening
+  category: timeline_direct
+  expect: answer
+  gold: [timeline-02]
+
+- id: q006
+  query: when is RSVP and stake due
+  category: timeline_direct
+  expect: answer
+  gold: [timeline-07]
+
+- id: q007
+  query: what dates is the hackathon
+  category: timeline_direct
+  expect: answer
+  gold: [timeline-09, terms-02]
+
+- id: q008
+  query: when are partner trials
+  category: timeline_direct
+  expect: answer
+  gold: [timeline-06]
+
+- id: q009
+  query: what comes after beta selections
+  category: timeline_multihop
+  expect: answer
+  gold: [timeline-04, timeline-05, terms-02]
+  note: requires ordering across milestones, not a single lookup
+
+- id: q010
+  query: is there a registration fee
+  category: faq_direct
+  expect: answer
+  gold: [faq-03]
+
+- id: q011
+  query: who can participate in hacker house goa
+  category: faq_direct
+  expect: answer
+  gold: [faq-00]
+
+- id: q012
+  query: what should I bring to the event
+  category: faq_direct
+  expect: answer
+  gold: [faq-02]
+
+- id: q013
+  query: how are teams formed
+  category: faq_direct
+  expect: answer
+  gold: [faq-04]
+
+- id: q014
+  query: can I start working on my project before the event
+  category: faq_direct
+  expect: answer
+  gold: [faq-05]
+
+- id: q015
+  query: how does the selection process work
+  category: faq_direct
+  expect: answer
+  gold: [faq-01, terms-02]
+
+# --- paraphrases: same facts, none of the original wording. This is where
+# --- embedding quality actually gets tested; lexical overlap will not save us.
+
+- id: q016
+  query: do I have to pay anything to join
+  category: faq_paraphrase
+  expect: answer
+  gold: [faq-03]
+
+- id: q017
+  query: am I allowed to write code in advance
+  category: faq_paraphrase
+  expect: answer
+  gold: [faq-05]
+
+- id: q018
+  query: what gear should I pack
+  category: faq_paraphrase
+  expect: answer
+  gold: [faq-02]
+
+- id: q019
+  query: can designers apply or is it only for programmers
+  category: faq_paraphrase
+  expect: answer
+  gold: [faq-00]
+
+- id: q020
+  query: will you help me find teammates if I come alone
+  category: faq_paraphrase
+  expect: answer
+  gold: [faq-04]
+
+- id: q021
+  query: is accommodation covered
+  category: faq_paraphrase
+  expect: answer
+  gold: [faq-03]
+
+- id: q022
+  query: how big can my team be
+  category: faq_paraphrase
+  expect: answer
+  gold: [faq-00]
+
+# --- terms: long clauses, the population where parent_child should pay off
+
+- id: q023
+  query: what is the minimum age to participate
+  category: terms
+  expect: answer
+  gold: [terms-01]
+
+- id: q024
+  query: who owns the intellectual property of what I build
+  category: terms
+  expect: answer
+  gold: [terms-05]
+
+- id: q025
+  query: what happens if I cancel after confirming my spot
+  category: terms
+  expect: answer
+  gold: [terms-03]
+
+- id: q026
+  query: what is the code of conduct
+  category: terms
+  expect: answer
+  gold: [terms-04]
+
+- id: q027
+  query: which law governs these terms
+  category: terms
+  expect: answer
+  gold: [terms-11]
+
+- id: q028
+  query: how do I contact the organizers
+  category: terms
+  expect: answer
+  gold: [terms-12]
+
+- id: q029
+  query: can the organizers change the rules later
+  category: terms
+  expect: answer
+  gold: [terms-10]
+
+- id: q030
+  query: will my photos be used for publicity
+  category: terms
+  expect: answer
+  gold: [terms-06]
+
+- id: q031
+  query: who pays for my travel and insurance
+  category: terms
+  expect: answer
+  gold: [terms-07]
+
+- id: q032
+  query: am I required to talk to sponsors
+  category: terms
+  expect: answer
+  gold: [terms-08]
+
+# --- tasks
+
+- id: q033
+  query: what is task 2 about
+  category: task
+  expect: answer
+  gold: [tasks-01]
+
+- id: q034
+  query: tell me about the photo frame generator challenge
+  category: task
+  expect: answer
+  gold: [tasks-00]
+
+- id: q035
+  query: which hashtag do I use for the voice RAG task
+  category: task
+  expect: answer
+  gold: [tasks-01]
+
+# --- conflicting sources: the site disagrees with itself, 2 to 1.
+# --- A correct system cites both figures rather than silently choosing.
+
+- id: q036
+  query: how many builders attend hacker house goa
+  category: conflict
+  expect: answer
+  gold: [about-00, timeline-09, terms-02]
+  note: about-00 says 500, timeline-09 and terms-02 say 247
+
+- id: q037
+  query: who organizes hacker house goa
+  category: terms
+  expect: answer
+  gold: [terms-00]
+
+- id: q038
+  query: is anything pinned on the notice board
+  category: notice
+  expect: answer
+  gold: [notice-board-00]
+
+# --- must refuse: answer is genuinely absent from the corpus ---------------
+
+- id: q039
+  query: what is the weather like in Goa in October
+  category: out_of_scope
+  expect: refuse
+  gold: []
+
+- id: q040
+  query: write me a poem about hackathons
+  category: out_of_scope
+  expect: refuse
+  gold: []
+  note: instruction, not a question — scope filter should catch it pre-retrieval
+
+- id: q041
+  query: what is the capital of France
+  category: out_of_scope
+  expect: refuse
+  gold: []
+
+- id: q042
+  query: how do I train a transformer from scratch
+  category: out_of_scope
+  expect: refuse
+  gold: []
+
+- id: q043
+  query: book me a flight to Goa
+  category: out_of_scope
+  expect: refuse
+  gold: []
+
+- id: q044
+  query: how many registrations were there in 2024
+  category: excluded_counter
+  expect: refuse
+  gold: []
+  note: |
+    The hero counters animate from 0 in client JS and are absent from server
+    HTML, so they are deliberately not indexed. This must refuse rather than
+    answer "0" — it is the exact failure the exclusion exists to prevent.
+
+- id: q045
+  query: what was the total bounty pool
+  category: excluded_counter
+  expect: refuse
+  gold: []
+
+- id: q046
+  query: who won the hackathon last year
+  category: excluded_volatile
+  expect: refuse
+  gold: []
+  note: /result is a live leaderboard, excluded as volatile
+
+- id: q047
+  query: what is the wifi password
+  category: adversarial_near_miss
+  expect: refuse
+  gold: []
+  note: |
+    Hardest case in the set. faq-02 mentions WiFi, so retrieval WILL return a
+    high-scoring chunk — but the password is not in it. A similarity threshold
+    alone cannot catch this; only the groundedness check can. If the system
+    invents a password, that is the failure mode this whole eval exists to
+    detect.
+
+- id: q048
+  query: how much prize money will I win
+  category: adversarial_near_miss
+  expect: refuse
+  gold: []
+  note: corpus mentions bounties but states no amount
