@@ -781,7 +781,7 @@ function startListening() {
    A key given via ?key= is consumed and stripped from the URL immediately --
    credentials do not belong in a URL that lands in history or a referrer. */
 const LS_BASE = "hhgoa.apiBase", LS_KEY = "hhgoa.apiKey";
-let apiBase = "", apiKey = "";
+let apiBase = "", apiKey = "", apiOk = null;
 
 function loadSettings() {
   const qp = new URLSearchParams(location.search);
@@ -800,6 +800,54 @@ function loadSettings() {
 }
 
 function url(path) { return (apiBase || "") + path; }
+
+/* Confirm an API is actually there, at load, before the first question.
+   A Netlify deploy hosts ONLY the frontend, so with API_BASE unset every
+   request resolves against the Netlify origin and 404s. Discovering that as a
+   cryptic failure on your first question is a bad first five seconds; the page
+   should say plainly that no backend is configured, and open Setup so it can
+   be fixed on the spot. */
+async function checkApi() {
+  const target = apiBase || location.origin;
+  try {
+    const res = await fetch(url("/healthz"), { cache: "no-store" });
+    if (!res.ok) throw new Error("HTTP " + res.status);
+    const h = await res.json();
+    apiOk = true;
+    renderApiStatus(true,
+      `API ok — ${h.vectors} vectors` +
+      (h.generation_enabled ? ", server key present" : ", no server key") +
+      `  ·  ${apiBase || "same origin"}`);
+    return h;
+  } catch (e) {
+    apiOk = false;
+    renderApiStatus(false,
+      `No API at ${target}. ` +
+      (apiBase
+        ? "The endpoint is set but unreachable — check it is running and that " +
+          "its ALLOWED_ORIGINS permits this site."
+        : "This page is hosted without a backend (Netlify serves the frontend " +
+          "only — it cannot run the Python API). Set the API endpoint below, " +
+          "or append ?api=https://your-api-host to this URL."));
+    // Force Setup open: there is nothing useful to do until this is resolved.
+    $("setupCard").classList.remove("done");
+    return null;
+  }
+}
+
+function renderApiStatus(ok, msg) {
+  let el = $("apiStatus");
+  if (!el) {
+    el = document.createElement("div");
+    el.id = "apiStatus";
+    el.className = "engine";
+    $("engineBadge").after(el);
+  }
+  el.innerHTML =
+    '<span class="pill ' + (ok ? "good" : "bad") + '">' +
+      (ok ? "api ok" : "no api") + "</span>" +
+    '<span class="msg">' + esc(msg) + "</span>";
+}
 
 function renderSetup(collapsed) {
   const card = $("setupCard"), pill = $("setupPill");
@@ -845,6 +893,7 @@ function saveSettings(store) {
   }
   renderSetup(true);
   localStorage.setItem("hhgoa.setupSeen", "1");
+  checkApi();   // the endpoint may have just changed; re-verify against it
 }
 
 /* ---------------------------------------------------------------------- ask */
@@ -875,9 +924,21 @@ async function ask(query) {
     if (!res.ok) throw new Error("HTTP " + res.status);
     data = await res.json();
   } catch (e) {
-    $("answer").textContent = "Request failed: " + e.message;
+    /* "Failed to fetch" is what a missing backend, a CORS rejection and a dead
+       host all look like from here, so name the likely cause rather than
+       echoing the browser's opaque string. */
+    const target = apiBase || location.origin;
+    $("answer").textContent =
+      "Request to " + target + " failed: " + e.message + "\n\n" +
+      (apiOk === false
+        ? "No API was reachable when this page loaded. If the frontend is on " +
+          "Netlify, the Python backend has to run elsewhere — set the API " +
+          "endpoint in Setup above. See DEPLOY.md."
+        : "The API answered at load but not now. Likely it restarted, or its " +
+          "CORS policy (ALLOWED_ORIGINS) does not include " + location.origin + ".");
     $("modeBadge").textContent = "error";
     $("modeBadge").className = "badge b-error";
+    checkApi();
     return;
   }
 
@@ -1313,9 +1374,12 @@ function renderEngineBadge() {
     '<span class="pill ' + (ok ? "good" : "bad") + '">' +
       (ok ? "voice ready" : "voice unavailable") + "</span>" +
     '<span class="msg">running in <b>' + esc(LABEL[e] || e) + "</b>" +
+      /* location.href, not a hardcoded localhost:7860 — that was a dev-time
+         string that shipped to a Netlify deploy and told visitors to open a
+         port on their own machine. */
       (ok ? "" : " — speech needs Google Chrome or Edge. If this is an " +
-                 "in-app/preview browser, open <b>http://localhost:7860</b> in " +
-                 "Chrome itself.") +
+                 "in-app/preview browser, open <b>" + esc(location.href) +
+                 "</b> in Chrome itself.") +
     "</span>";
 }
 
@@ -1343,6 +1407,7 @@ renderSetup(!!localStorage.getItem("hhgoa.setupSeen"));
 initSpeech();
 idleWave();
 renderEngineBadge();
+checkApi();
 waitForVoices();   // warm the voice list so the first answer can speak immediately
 </script>
 </body>
