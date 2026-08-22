@@ -39,7 +39,13 @@
     # Voice input needs an explicit grant for the mic in an embedded context.
     Permissions-Policy = "microphone=(self)"
 
-[[redirects]]
-  from = "/*"
-  to = "/index.html"
-  status = 200
+# No SPA catch-all redirect, deliberately.
+#
+# `from = "/*" -> "/index.html" status = 200` looks harmless for a single-page
+# app, but it makes EVERY path return 200 with an HTML body — including
+# /healthz and /ask. The frontend's startup probe then sees a 200 and could
+# conclude an API is present when Netlify is just echoing the page back. It
+# also masks a missing backend as a working one.
+#
+# This app has no client-side routing, so there is nothing to catch. Unknown
+# paths should 404 honestly.

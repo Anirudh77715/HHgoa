@@ -813,6 +813,13 @@ async function checkApi() {
     const res = await fetch(url("/healthz"), { cache: "no-store" });
     if (!res.ok) throw new Error("HTTP " + res.status);
     const h = await res.json();
+    /* Validate the SHAPE, not just the status. A static host with a SPA
+       catch-all returns 200 and an HTML body for every path, so "it responded"
+       proves nothing about there being an API behind it. */
+    if (typeof h !== "object" || h === null || typeof h.vectors !== "number") {
+      throw new Error("responded, but not with a health payload — " +
+                      "is this a static host echoing the page back?");
+    }
     apiOk = true;
     renderApiStatus(true,
       `API ok — ${h.vectors} vectors` +

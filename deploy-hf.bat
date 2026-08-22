@@ -88,6 +88,19 @@ if not "!CODE!"=="200" (
 )
 
 echo   Found it.
+
+REM Warn if the Space was created with the wrong SDK. The push fixes it (the
+REM README frontmatter is authoritative), but saying so up front beats leaving
+REM someone wondering why a "static" Space is suddenly building a container.
+curl -s "https://huggingface.co/api/spaces/!HFUSER!/!HFSPACE!" > "%TEMP%\hfinfo.txt" 2>nul
+findstr /c:"\"sdk\":\"docker\"" "%TEMP%\hfinfo.txt" >nul
+if errorlevel 1 (
+  echo.
+  echo   NOTE: this Space is not currently a Docker Space.
+  echo   Pushing will convert it - our README.md declares "sdk: docker",
+  echo   and that frontmatter is what decides the Space type.
+)
+del "%TEMP%\hfinfo.txt" 2>nul
 echo.
 echo  ============================================================
 echo   Git will now ask for a Username and a Password.
@@ -102,7 +115,16 @@ echo.
 git remote remove hf 2>nul
 git remote add hf "!HFURL!"
 
-git push hf main
+REM --force is required, not optional. Creating a Space in the browser makes an
+REM initial commit (a stub README), so the Space's history and this repo's have
+REM no common ancestor and a normal push is rejected as non-fast-forward. The
+REM Space is brand new and contains nothing worth keeping, so overwriting it is
+REM the intended outcome rather than a risk.
+REM
+REM The push also REPLACES the Space's README.md, and its YAML frontmatter is
+REM what actually decides the Space type -- so `sdk: docker` in our README
+REM converts a Space that was created as "static" into a Docker one.
+git push hf main --force
 set PUSHRC=%errorlevel%
 
 REM Do not leave the remote configured; it keeps the URL out of .git/config
