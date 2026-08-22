@@ -1,0 +1,343 @@
+{
+  "threshold": 0.8167,
+  "strategy": "parent_child",
+  "n_cases": 24,
+  "scored_correct": 19,
+  "scored_total": 19,
+  "documented_limits": 5,
+  "undocumented_failures": [],
+  "results": [
+    {
+      "id": "g001",
+      "query": "what is the weather like in Goa in October",
+      "expect": "block",
+      "acted": "block",
+      "correct": true,
+      "known_limit": false,
+      "reason": "ungrounded_specifics",
+      "first_gate": "reaches_generation",
+      "top_score": 0.8342,
+      "unsupported": [
+        "30"
+      ],
+      "checked": 2
+    },
+    {
+      "id": "g002",
+      "query": "how many registrations were there in 2024",
+      "expect": "block",
+      "acted": "block",
+      "correct": true,
+      "known_limit": false,
+      "reason": "ungrounded_specifics",
+      "first_gate": "reaches_generation",
+      "top_score": 0.8655,
+      "unsupported": [
+        "12,000",
+        "2024"
+      ],
+      "checked": 2
+    },
+    {
+      "id": "g003",
+      "query": "what was the total bounty pool",
+      "expect": "block",
+      "acted": "block",
+      "correct": true,
+      "known_limit": false,
+      "reason": "ungrounded_specifics",
+      "first_gate": "reaches_generation",
+      "top_score": 0.8263,
+      "unsupported": [
+        "$50,000",
+        "50,000"
+      ],
+      "checked": 2
+    },
+    {
+      "id": "g004",
+      "query": "who won the hackathon last year",
+      "expect": "block",
+      "acted": "block",
+      "correct": true,
+      "known_limit": false,
+      "reason": "ungrounded_specifics",
+      "first_gate": "reaches_generation",
+      "top_score": 0.8461,
+      "unsupported": [
+        "2024",
+        "500000",
+        "500000 rupees"
+      ],
+      "checked": 3
+    },
+    {
+      "id": "g005",
+      "query": "book me a flight to Goa",
+      "expect": "block",
+      "acted": "block",
+      "correct": true,
+      "known_limit": false,
+      "reason": "ungrounded_specifics",
+      "first_gate": "scope",
+      "top_score": 0.8403,
+      "unsupported": [
+        "30"
+      ],
+      "checked": 1
+    },
+    {
+      "id": "g006",
+      "query": "how many registrations were there in 2024",
+      "expect": "pass",
+      "acted": "pass",
+      "correct": true,
+      "known_limit": false,
+      "reason": "grounded",
+      "first_gate": "reaches_generation",
+      "top_score": 0.8655,
+      "unsupported": [],
+      "checked": 3
+    },
+    {
+      "id": "g010",
+      "query": "when does registration begin",
+      "expect": "pass",
+      "acted": "pass",
+      "correct": true,
+      "known_limit": false,
+      "reason": "grounded",
+      "first_gate": "reaches_generation",
+      "top_score": 0.8615,
+      "unsupported": [],
+      "checked": 2
+    },
+    {
+      "id": "g011",
+      "query": "is there a registration fee",
+      "expect": "pass",
+      "acted": "pass",
+      "correct": true,
+      "known_limit": false,
+      "reason": "no_checkable_claims",
+      "first_gate": "reaches_generation",
+      "top_score": 0.8605,
+      "unsupported": [],
+      "checked": 0
+    },
+    {
+      "id": "g012",
+      "query": "what is the weather like in Goa in October",
+      "expect": "pass",
+      "acted": "pass",
+      "correct": true,
+      "known_limit": false,
+      "reason": "refusal_no_claims",
+      "first_gate": "reaches_generation",
+      "top_score": 0.8342,
+      "unsupported": [],
+      "checked": 0
+    },
+    {
+      "id": "g013",
+      "query": "what was the total bounty pool",
+      "expect": "pass",
+      "acted": "pass",
+      "correct": true,
+      "known_limit": false,
+      "reason": "refusal_no_claims",
+      "first_gate": "reaches_generation",
+      "top_score": 0.8263,
+      "unsupported": [],
+      "checked": 0
+    },
+    {
+      "id": "g014",
+      "query": "when are partner trials",
+      "expect": "pass",
+      "acted": "pass",
+      "correct": true,
+      "known_limit": false,
+      "reason": "grounded",
+      "first_gate": "reaches_generation",
+      "top_score": 0.9085,
+      "unsupported": [],
+      "checked": 2
+    },
+    {
+      "id": "g020",
+      "query": "when does registration begin",
+      "expect": "block",
+      "acted": "pass",
+      "correct": false,
+      "known_limit": true,
+      "reason": "grounded",
+      "first_gate": "reaches_generation",
+      "top_score": 0.8615,
+      "unsupported": [],
+      "checked": 2
+    },
+    {
+      "id": "g021",
+      "query": "what is the weather like in Goa in October",
+      "expect": "block",
+      "acted": "pass",
+      "correct": false,
+      "known_limit": true,
+      "reason": "no_checkable_claims",
+      "first_gate": "reaches_generation",
+      "top_score": 0.8342,
+      "unsupported": [],
+      "checked": 0
+    },
+    {
+      "id": "g022",
+      "query": "what is the wifi password",
+      "expect": "block",
+      "acted": "pass",
+      "correct": false,
+      "known_limit": true,
+      "reason": "no_checkable_claims",
+      "first_gate": "score",
+      "top_score": 0.7964,
+      "unsupported": [],
+      "checked": 0
+    },
+    {
+      "id": "g040",
+      "query": "asdf qwer zxcv hjkl",
+      "expect": "block",
+      "acted": "block",
+      "correct": true,
+      "known_limit": false,
+      "reason": "stopped_at_vocabulary",
+      "first_gate": "vocabulary",
+      "top_score": 0.8317,
+      "unsupported": [],
+      "checked": 0
+    },
+    {
+      "id": "g041",
+      "query": "tu pata hai na matlab kya bol raha hoon",
+      "expect": "block",
+      "acted": "block",
+      "correct": true,
+      "known_limit": false,
+      "reason": "stopped_at_vocabulary",
+      "first_gate": "vocabulary",
+      "top_score": 0.8377,
+      "unsupported": [],
+      "checked": 0
+    },
+    {
+      "id": "g042",
+      "query": "qwertyuiop",
+      "expect": "block",
+      "acted": "block",
+      "correct": true,
+      "known_limit": false,
+      "reason": "stopped_at_vocabulary",
+      "first_gate": "vocabulary",
+      "top_score": 0.8362,
+      "unsupported": [],
+      "checked": 0
+    },
+    {
+      "id": "g043",
+      "query": "\u092a\u0902\u091c\u0940\u0915\u0930\u0923 \u0915\u092c \u0936\u0941\u0930\u0942 \u0939\u094b\u0924\u093e \u0939\u0948",
+      "expect": "block",
+      "acted": "block",
+      "correct": true,
+      "known_limit": false,
+      "reason": "stopped_at_vocabulary",
+      "first_gate": "vocabulary",
+      "top_score": 0.8044,
+      "unsupported": [],
+      "checked": 0
+    },
+    {
+      "id": "g044",
+      "query": "when does registration begin",
+      "expect": "pass",
+      "acted": "pass",
+      "correct": true,
+      "known_limit": false,
+      "reason": "stopped_at_reaches_generation",
+      "first_gate": "reaches_generation",
+      "top_score": 0.8615,
+      "unsupported": [],
+      "checked": 0
+    },
+    {
+      "id": "g045",
+      "query": "mujhe registration ke bare mein batao",
+      "expect": "pass",
+      "acted": "pass",
+      "correct": true,
+      "known_limit": false,
+      "reason": "stopped_at_reaches_generation",
+      "first_gate": "reaches_generation",
+      "top_score": 0.8458,
+      "unsupported": [],
+      "checked": 0
+    },
+    {
+      "id": "g030",
+      "query": "how many builders attend hacker house goa",
+      "expect": "block",
+      "acted": "block",
+      "correct": true,
+      "known_limit": false,
+      "reason": "ungrounded_specifics",
+      "first_gate": "reaches_generation",
+      "top_score": 0.9093,
+      "unsupported": [
+        "50"
+      ],
+      "checked": 1
+    },
+    {
+      "id": "g031",
+      "query": "when does registration begin",
+      "expect": "block",
+      "acted": "block",
+      "correct": true,
+      "known_limit": false,
+      "reason": "ungrounded_specifics",
+      "first_gate": "reaches_generation",
+      "top_score": 0.8615,
+      "unsupported": [
+        "202"
+      ],
+      "checked": 2
+    },
+    {
+      "id": "g032",
+      "query": "is there a registration fee",
+      "expect": "block",
+      "acted": "pass",
+      "correct": false,
+      "known_limit": true,
+      "reason": "no_checkable_claims",
+      "first_gate": "reaches_generation",
+      "top_score": 0.8605,
+      "unsupported": [],
+      "checked": 0
+    },
+    {
+      "id": "g023",
+      "query": "how many builders attend hacker house goa",
+      "expect": "pass",
+      "acted": "block",
+      "correct": false,
+      "known_limit": true,
+      "reason": "ungrounded_specifics",
+      "first_gate": "reaches_generation",
+      "top_score": 0.9093,
+      "unsupported": [
+        "247"
+      ],
+      "checked": 2
+    }
+  ]
+}

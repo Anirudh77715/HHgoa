@@ -4,10 +4,9 @@
     "/",
     "/terms"
   ],
-  "n_docs": 33,
-  "n_chars": 11109,
+  "n_docs": 32,
+  "n_chars": 11068,
   "by_kind": {
-    "notice": 1,
     "timeline": 10,
     "task": 2,
     "faq": 6,
@@ -22,6 +21,17 @@
     {
       "what": "/result leaderboard ranks",
       "why": "Live reveal page; contents change as ranks are announced. Stale by design."
+    },
+    {
+      "what": "empty-state placeholders (e.g. the notice board's 'Nothing pinned yet')",
+      "why": "Volatile UI state rather than content, and measurably harmful in the index: a 41-char chunk had the highest mean cosine of all 92 vectors against control queries it shares no topic with, taking rank 1 on 6/48 benchmark queries. See EMPTY_STATE_RE."
+    }
+  ],
+  "dropped": [
+    {
+      "doc_id": "notice-board-00",
+      "reason": "empty-state placeholder ('Nothing pinned yet')",
+      "text": "Pinned Up Notice Board Nothing pinned yet"
     }
   ]
 }

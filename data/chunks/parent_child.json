@@ -1,19 +1,5 @@
 [
   {
-    "chunk_id": "pc::notice-board-00::00",
-    "doc_id": "notice-board-00",
-    "strategy": "parent_child",
-    "embed_text": "Pinned Up Notice Board Nothing pinned yet",
-    "context_text": "Pinned Up Notice Board Nothing pinned yet",
-    "title": "Notice Board",
-    "url": "https://hhgoa.com/#notice-board",
-    "kind": "notice",
-    "meta": {
-      "child": 0,
-      "n_children": 1
-    }
-  },
-  {
     "chunk_id": "pc::timeline-00::00",
     "doc_id": "timeline-00",
     "strategy": "parent_child",

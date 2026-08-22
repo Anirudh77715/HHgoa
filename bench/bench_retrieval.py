@@ -11,6 +11,13 @@ Three things are measured, because any one alone is misleading:
             garbage in 2ms is fast and worthless; latency without recall is a
             vanity metric.
 
+  prec@1    Whether the FIRST result is a gold doc. recall@5 alone hid a real
+            bug: a 41-char empty-state doc ranked #1 for unrelated queries
+            while the gold doc still sat somewhere in the top 5, so recall@5
+            stayed high and the failure stayed invisible. The `attractors`
+            block names any doc that keeps winning rank 1 without being gold,
+            so that class of bug cannot hide behind an averaged metric again.
+
   threshold Calibrates RETRIEVAL_MIN_SCORE from data instead of guessing. We
             sweep candidate cutoffs and report which one best separates
             answerable queries from ones that must be refused. The guardrail
@@ -32,7 +39,7 @@ import json
 import statistics
 import sys
 import time
-from collections import defaultdict
+from collections import Counter, defaultdict
 from pathlib import Path
 
 import yaml
@@ -44,6 +51,10 @@ from app.index.store import VectorStore
 QUERIES = Path("bench/queries.yaml")
 REPORT_DIR = Path("bench/reports")
 STRATEGIES = ("structural", "recursive", "parent_child")
+
+# A doc that wins rank 1 for this many queries it is not gold for is reported
+# as an attractor. 3 of 48 is already well past what topic overlap explains.
+ATTRACTOR_MIN = 3
 
 
 def pct(vals: list[float], p: float) -> float:
@@ -87,10 +98,17 @@ def bench_strategy(
 
     # Correctness pass: deterministic, so once is enough.
     hits = 0
+    p1_hits = 0
+    rr_sum = 0.0
     answerable = 0
     by_cat: dict[str, list[int]] = defaultdict(list)
+    p1_by_cat: dict[str, list[int]] = defaultdict(list)
     top_scores: dict[str, float] = {}
     detail: list[dict] = []
+    # Every query's rank-1 doc, and the subset where that doc was not gold.
+    # A doc that dominates the second counter is an attractor, not a match.
+    top1_all: Counter[str] = Counter()
+    top1_wrong: Counter[str] = Counter()
 
     for q in queries:
         qv = embedder.embed_query(q["query"])
@@ -99,11 +117,27 @@ def bench_strategy(
         top = results[0][0] if results else 0.0
         top_scores[q["id"]] = top
 
-        hit = bool(set(got_docs) & set(q["gold"])) if q["gold"] else None
+        gold = set(q["gold"])
+        top1 = got_docs[0] if got_docs else ""
+        # Rank counts retrieved rows. Under parent_child several rows can share
+        # a parent, so this is a lower bound on the rank a caller sees after
+        # Retriever collapses to unique parents -- never an overstatement.
+        rank = next((i + 1 for i, d in enumerate(got_docs) if d in gold), 0)
+        p1 = (top1 in gold) if gold else None
+
+        if top1:
+            top1_all[top1] += 1
+            if top1 not in gold:
+                top1_wrong[top1] += 1
+
+        hit = bool(set(got_docs) & gold) if gold else None
         if q["expect"] == "answer":
             answerable += 1
             hits += int(bool(hit))
+            p1_hits += int(bool(p1))
+            rr_sum += 1.0 / rank if rank else 0.0
             by_cat[q["category"]].append(int(bool(hit)))
+            p1_by_cat[q["category"]].append(int(bool(p1)))
 
         detail.append(
             {
@@ -113,6 +147,8 @@ def bench_strategy(
                 "expect": q["expect"],
                 "top_score": round(top, 4),
                 "hit": hit,
+                "p1": p1,
+                "rank": rank,
                 "top_docs": got_docs[:3],
             }
         )
@@ -135,11 +171,27 @@ def bench_strategy(
         "n_vectors": len(store),
         "n_calls": len(total_ms),
         "recall_at_k": round(hits / answerable, 4) if answerable else 0.0,
+        "precision_at_1": round(p1_hits / answerable, 4) if answerable else 0.0,
+        "mrr_at_k": round(rr_sum / answerable, 4) if answerable else 0.0,
         "hits": hits,
+        "p1_hits": p1_hits,
         "answerable": answerable,
         "recall_by_category": {
             c: round(sum(v) / len(v), 3) for c, v in sorted(by_cat.items())
         },
+        "precision_at_1_by_category": {
+            c: round(sum(v) / len(v), 3) for c, v in sorted(p1_by_cat.items())
+        },
+        "attractors": [
+            {
+                "doc_id": d,
+                "rank1_total": top1_all[d],
+                "rank1_not_gold": n,
+                "share_of_queries": round(n / len(queries), 3),
+            }
+            for d, n in top1_wrong.most_common()
+            if n >= ATTRACTOR_MIN
+        ],
         "latency_ms": {
             "embed": {p: round(pct(embed_ms, p), 3) for p in (50, 70, 100)},
             "search": {p: round(pct(search_ms, p), 3) for p in (50, 70, 100)},
@@ -227,6 +279,8 @@ def main() -> int:
         lat = r["latency_ms"]
         print(f"=== {name} ({r['n_vectors']} vectors, {r['n_calls']} timed calls) ===")
         print(f"  recall@{args.k}   : {r['recall_at_k']:.3f}  ({r['hits']}/{r['answerable']})")
+        print(f"  prec@1     : {r['precision_at_1']:.3f}  "
+              f"({r['p1_hits']}/{r['answerable']})   mrr@{args.k} {r['mrr_at_k']:.3f}")
         print(f"  embed  ms  : {fmt(r['_raw']['embed'])}")
         print(f"  search ms  : {fmt(r['_raw']['search'])}")
         print(f"  TOTAL  ms  : {fmt(r['_raw']['total'])}")
@@ -238,10 +292,16 @@ def main() -> int:
             print(f"  separation : {cal['separation_margin']:+.4f} "
                   f"(answerable min {cal['answerable_scores']['min']}, "
                   f"refuse max {cal['refuse_scores']['max']})")
-        print("  recall by category:")
+        print("  recall / prec@1 by category:")
+        p1c = r["precision_at_1_by_category"]
         for c, v in r["recall_by_category"].items():
             flag = "  <-- weak" if v < 0.8 else ""
-            print(f"      {c:<24} {v:.2f}{flag}")
+            print(f"      {c:<24} r {v:.2f}   p1 {p1c.get(c, 0.0):.2f}{flag}")
+        if r["attractors"]:
+            print("  ATTRACTORS (won rank 1 while not gold):")
+            for a in r["attractors"]:
+                print(f"      {a['doc_id']:<20} {a['rank1_not_gold']:>3} queries "
+                      f"({a['share_of_queries']:.0%})")
         print()
 
     if not results:
@@ -251,6 +311,8 @@ def main() -> int:
     best = max(results, key=lambda r: (r["recall_at_k"], -r["latency_ms"]["total"][50]))
     print(f"best recall@{args.k}: {best['strategy']} "
           f"({best['recall_at_k']:.3f} @ p50 {best['latency_ms']['total'][50]}ms)")
+    best_p1 = max(results, key=lambda r: (r["precision_at_1"], -r["latency_ms"]["total"][50]))
+    print(f"best prec@1   : {best_p1['strategy']} ({best_p1['precision_at_1']:.3f})")
 
     REPORT_DIR.mkdir(parents=True, exist_ok=True)
     for r in results:

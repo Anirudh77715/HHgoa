@@ -1,0 +1,1349 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ask HH Goa — voice RAG</title>
+
+<!--
+  Voice frontend for the HH Goa 2026 Task #2 submission.  #RAGInGoa
+
+  DESIGN
+  Palette and type are lifted from hhgoa.com itself, read off the live page's
+  computed styles rather than eyeballed: deep green #0B6839 ground, white body
+  copy, yellow #FEE101 primary action with its signature soft glow, hot pink
+  #FF0080 secondary accent, cream #FFFBE8 panels. Imbue for uppercase display
+  headings, Victor Mono for everything else. Square corners on actions, as on
+  the site's APPLY button.
+
+  Fonts load from Google Fonts with a full fallback stack -- if the network or
+  a CSP blocks them the page degrades to system mono/serif and stays legible.
+  Nothing else is remote: no framework, no CDN script, no build step.
+
+  WHAT THE INTERACTION IS FOR
+  The three animated panels are not decoration; they are the evidence the task
+  asks for, made legible at a glance:
+
+    pipeline    every gate as a node that lights up as it passes or stops.
+                "Guardrails that know when not to answer" is a scored
+                requirement, so a refusal renders as a first-class result
+                naming the gate that fired, never as an error state.
+
+    confidence  the top cosine against the calibrated threshold, on the real
+                0.70-0.95 scale bge actually occupies. Shows at a glance that
+                the two populations overlap -- which is exactly why the score
+                gate is only a cost filter.
+
+    latency     proportional bars per stage. A literal <200ms voice-to-spoken-
+                answer is not achievable (LLM generation alone is 300ms-2s) and
+                claiming it reads as a misunderstanding. The retrieval subsystem
+                IS fast, so it is isolated and highlighted instead of being
+                blended into one flattering average. A FAILED generation call
+                still shows its full network cost.
+-->
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Imbue:opsz,wght@10..100,400;10..100,700;10..100,900&family=Victor+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+
+<style>
+  :root {
+    --green:      #0B6839;
+    --green-deep: #06381f;
+    --green-mid:  #095230;
+    --yellow:     #FEE101;
+    --pink:       #FF0080;
+    --cream:      #FFFBE8;
+    --white:      #ffffff;
+    --dim:        rgba(255,251,232,.62);
+    --line:       rgba(255,251,232,.22);
+
+    --mono: "Victor Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    --display: "Imbue", "Times New Roman", Georgia, serif;
+    --glow: 0 0 16px 3.5px rgba(254,225,1,.27);
+  }
+
+  * { box-sizing: border-box; }
+
+  html, body { background: var(--green); }
+
+  body {
+    margin: 0;
+    padding: 28px 16px 80px;
+    color: var(--white);
+    font: 15px/1.6 var(--mono);
+    /* Faint diagonal weave so the large green field is not dead flat. */
+    background-image:
+      repeating-linear-gradient(45deg,
+        rgba(255,251,232,.022) 0 2px, transparent 2px 9px);
+  }
+
+  .wrap { max-width: 820px; margin: 0 auto; }
+
+  /* ------------------------------------------------------------ header --- */
+  header { margin-bottom: 22px; }
+  h1 {
+    font-family: var(--display);
+    font-weight: 900;
+    text-transform: uppercase;
+    font-size: clamp(44px, 11vw, 78px);
+    line-height: .86;
+    margin: 0;
+    color: var(--cream);
+  }
+  h1 .accent { color: var(--yellow); }
+  .sub { color: var(--dim); font-size: 13.5px; margin-top: 10px; max-width: 60ch; }
+  .hash {
+    display: inline-block; margin-top: 10px;
+    background: var(--pink); color: var(--white);
+    padding: 3px 10px; font-weight: 700; font-size: 12.5px;
+    transform: rotate(-1.4deg);
+  }
+
+  /* ------------------------------------------------------------- panels -- */
+  .panel {
+    border: 1px solid var(--line);
+    background: var(--green-mid);
+    padding: 18px;
+    margin-bottom: 16px;
+  }
+  .panel.cream { background: var(--cream); color: var(--green); border-color: transparent; }
+  .panel.deep  { background: var(--green-deep); }
+
+  h2 {
+    font-family: var(--display); font-weight: 700; text-transform: uppercase;
+    font-size: 26px; line-height: 1; letter-spacing: .01em;
+    margin: 0 0 14px; display: flex; align-items: center; gap: 12px;
+    flex-wrap: wrap;
+  }
+  .panel.cream h2 { color: var(--green); }
+  .panel:not(.cream) h2 { color: var(--yellow); }
+
+  /* -------------------------------------------------------------- mic ---- */
+  .mic-row { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
+
+  button {
+    font: 500 15px var(--mono); cursor: pointer;
+    border-radius: 0; border: 1px solid var(--yellow);
+    background: transparent; color: var(--yellow);
+    padding: 11px 18px; transition: transform .12s, background .15s, color .15s, box-shadow .2s;
+  }
+  button:hover:not(:disabled) { background: var(--yellow); color: var(--green-deep); }
+  button:active:not(:disabled) { transform: translateY(2px); }
+  button:disabled { opacity: .35; cursor: not-allowed; }
+
+  #mic {
+    background: var(--yellow); color: var(--green-deep);
+    font-weight: 700; letter-spacing: .04em; text-transform: uppercase;
+    box-shadow: var(--glow); min-width: 168px;
+  }
+  #mic.live {
+    background: var(--pink); color: var(--white); border-color: var(--pink);
+    animation: pulse 1.15s ease-in-out infinite;
+  }
+  @keyframes pulse {
+    0%,100% { box-shadow: 0 0 0 0 rgba(255,0,128,.55); }
+    50%     { box-shadow: 0 0 0 14px rgba(255,0,128,0); }
+  }
+
+  canvas#wave {
+    flex: 1; min-width: 150px; height: 52px; display: block;
+    border: 1px solid var(--line); background: rgba(6,56,31,.55);
+  }
+
+  .transcript {
+    margin-top: 14px; font-size: 19px; min-height: 30px;
+    font-family: var(--display); font-weight: 700; color: var(--cream);
+  }
+  .transcript:empty::before {
+    content: "your question appears here"; color: var(--dim);
+    font-family: var(--mono); font-size: 14px; font-weight: 400;
+  }
+  .transcript .interim { color: var(--yellow); opacity: .7; }
+
+  .fallback { margin-top: 14px; display: flex; gap: 0; }
+  .fallback input {
+    flex: 1; font: 400 15px var(--mono); padding: 11px 13px;
+    border: 1px solid var(--line); border-right: 0;
+    background: rgba(6,56,31,.6); color: var(--cream);
+  }
+  .fallback input:focus { outline: none; border-color: var(--yellow); }
+  .fallback input::placeholder { color: var(--dim); }
+
+  .chips { display: flex; flex-wrap: wrap; gap: 7px; margin-top: 14px; }
+  .chips button {
+    font-size: 12.5px; padding: 5px 11px; font-weight: 400;
+    border-color: var(--line); color: var(--dim);
+  }
+  .chips button:hover { background: var(--pink); border-color: var(--pink); color: var(--white); }
+
+  .note { font-size: 12.5px; margin-top: 10px; color: var(--yellow); line-height: 1.5; }
+  .diag {
+    margin-top: 12px; padding: 12px; font: 400 12px/1.6 var(--mono);
+    background: rgba(6,56,31,.75); border: 1px solid var(--line);
+    color: var(--cream); white-space: pre-wrap; overflow-x: auto;
+  }
+  .diag .ok   { color: var(--yellow); }
+  .diag .bad  { color: var(--pink); }
+
+  .engine {
+    margin-top: 12px; font-size: 12px; display: flex; align-items: center;
+    gap: 8px; flex-wrap: wrap;
+  }
+  .engine .pill {
+    padding: 3px 9px; font-weight: 700; letter-spacing: .04em;
+    text-transform: uppercase; font-size: 11px;
+  }
+  .engine .pill.good { background: var(--yellow); color: var(--green-deep); }
+  .engine .pill.bad  { background: var(--pink);   color: var(--white); }
+  .engine .msg { color: var(--dim); }
+  .engine .msg b { color: var(--cream); }
+
+  /* --- setup panel --- */
+  .field { display: block; margin-bottom: 16px; }
+  .field > span { display: block; font-size: 12.5px; color: var(--cream); margin-bottom: 6px; }
+  .field > span em { color: var(--yellow); font-style: normal; }
+  .field input {
+    width: 100%; font: 400 14px var(--mono); padding: 10px 12px;
+    border: 1px solid var(--line); background: rgba(6,56,31,.6); color: var(--cream);
+  }
+  .field input:focus { outline: none; border-color: var(--yellow); }
+  .field input::placeholder { color: var(--dim); }
+  .field small {
+    display: block; margin-top: 6px; font-size: 11.5px; color: var(--dim); line-height: 1.5;
+  }
+  .field small a { color: var(--yellow); }
+  .field small.warn-text { color: rgba(255,0,128,.85); }
+  .field small b, .field small code { color: var(--cream); }
+  .setup-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+  .setup-actions #setupSave { background: var(--yellow); color: var(--green-deep);
+                              font-weight: 700; box-shadow: var(--glow); }
+  #setupCard.done #setupBody { display: none; }
+  #setupCard.done h2 { margin-bottom: 0; }
+  h2 .pill { font-size: 11px; padding: 3px 9px; font-weight: 700;
+             text-transform: uppercase; letter-spacing: .04em; }
+  h2 .pill.good { background: var(--yellow); color: var(--green-deep); }
+  h2 .pill.raw  { background: transparent; color: var(--dim); border: 1px solid var(--line); }
+  h2 .edit { font-family: var(--mono); font-size: 11px; text-transform: none;
+             letter-spacing: 0; cursor: pointer; color: var(--dim);
+             text-decoration: underline; font-weight: 400; }
+  .panel.cream .note { color: #8a6a00; }
+
+  /* ------------------------------------------------------------ pipeline - */
+  .pipe { display: flex; align-items: stretch; gap: 0; flex-wrap: wrap; }
+  /* Every node carries all four borders and pulls left by 1px, so adjacent
+     edges collapse into a single rule on a row AND a wrapped row still gets a
+     right edge. Relying on :last-child left the wrapped row open on mobile. */
+  .node {
+    flex: 1; min-width: 92px; text-align: center; padding: 11px 6px;
+    border: 1px solid var(--line); margin-right: -1px;
+    font-size: 11px; letter-spacing: .06em; text-transform: uppercase;
+    color: var(--dim); position: relative;
+    opacity: 0; transform: translateY(6px);
+    animation: rise .32s ease forwards;
+  }
+  @keyframes rise { to { opacity: 1; transform: none; } }
+  .node .dot {
+    display: block; width: 11px; height: 11px; margin: 0 auto 7px;
+    border: 1px solid currentColor; border-radius: 50%;
+  }
+  .node.pass { color: var(--yellow); border-color: rgba(254,225,1,.4); }
+  .node.pass .dot { background: var(--yellow); box-shadow: var(--glow); }
+  .node.stop { color: var(--pink); border-color: var(--pink); background: rgba(255,0,128,.1); }
+  .node.stop .dot { background: var(--pink); }
+  .node.warn { color: var(--yellow); }
+  .node.warn .dot { background: repeating-linear-gradient(45deg, var(--yellow) 0 2px, transparent 2px 4px); }
+  .node.skip { opacity: .32; }
+  .node small { display: block; margin-top: 5px; font-size: 10px; letter-spacing: 0;
+                text-transform: none; opacity: .8; }
+
+  /* ---------------------------------------------------------- confidence - */
+  .meter { margin-top: 6px; }
+  /* Headroom for the marker's label. Grid columns come from .lat-row so the
+     mobile breakpoint applies here too -- an inline width would bypass it and
+     squeeze the track to nothing on a phone. */
+  .meter-row { margin-top: 26px; }
+  /* No overflow:hidden here — the threshold marker deliberately overhangs the
+     bar and carries a label above it, and clipping hid both. The fill is a
+     percentage-width child, so it cannot overflow anyway. */
+  .meter-bar {
+    position: relative; height: 26px; background: rgba(6,56,31,.7);
+    border: 1px solid var(--line);
+  }
+  .meter-fill {
+    height: 100%; background: var(--yellow); width: 0;
+    transition: width .55s cubic-bezier(.2,.8,.25,1);
+  }
+  .meter-fill.under { background: var(--pink); }
+  .meter-mark {
+    position: absolute; top: -3px; bottom: -3px; width: 2px;
+    background: var(--cream);
+  }
+  .meter-mark::after {
+    content: attr(data-label); position: absolute; top: -17px; left: 50%;
+    transform: translateX(-50%); font-size: 10px; color: var(--cream);
+    white-space: nowrap;
+  }
+  .meter-scale {
+    display: flex; justify-content: space-between;
+    font-size: 10.5px; color: var(--dim); margin-top: 4px;
+  }
+
+  /* ------------------------------------------------------------- answer -- */
+  .badge {
+    font-family: var(--mono); font-size: 11px; font-weight: 700;
+    letter-spacing: .08em; text-transform: uppercase; padding: 4px 9px;
+  }
+  .b-generated  { background: var(--yellow); color: var(--green-deep); }
+  .b-extractive { background: var(--pink);   color: var(--white); }
+  .b-refused    { background: var(--pink);   color: var(--white); }
+  .b-error      { background: #000;          color: var(--pink); }
+
+  .answer {
+    font-size: 18px; line-height: 1.55; white-space: pre-wrap;
+    margin: 4px 0 2px; min-height: 28px;
+  }
+  .answer .caret {
+    display: inline-block; width: 8px; height: 18px; margin-left: 1px;
+    background: var(--green); vertical-align: -3px; animation: blink .9s steps(1) infinite;
+  }
+  @keyframes blink { 50% { opacity: 0; } }
+
+  .cites { list-style: none; padding: 0; margin: 16px 0 0; }
+  .cites li {
+    font-size: 13px; padding: 7px 10px; margin-bottom: 5px;
+    border-left: 3px solid var(--pink); background: rgba(11,104,57,.07);
+    display: flex; justify-content: space-between; gap: 10px; align-items: baseline;
+    opacity: 0; animation: rise .3s ease forwards;
+  }
+  .cites a { color: var(--green); font-weight: 700; text-decoration: none; }
+  .cites a:hover { color: var(--pink); text-decoration: underline; }
+  .cites .meta { color: rgba(11,104,57,.65); font-size: 11.5px; white-space: nowrap; }
+
+  /* ------------------------------------------------------------ latency -- */
+  .lat-row {
+    display: grid; grid-template-columns: 190px 1fr 74px;
+    align-items: center; gap: 10px; font-size: 12.5px; padding: 3px 0;
+  }
+  .lat-row .lbl { color: var(--dim); }
+  .lat-row .track { height: 12px; background: rgba(255,251,232,.08); position: relative; }
+  /* display:block is load-bearing. `.bar` is a <span> inside `.track`, and an
+     inline element ignores width/height entirely -- every bar rendered at 0x0
+     and the panel showed nothing but empty track backgrounds. `.track` got
+     away with it only because it is a grid item, which blockifies it. */
+  .lat-row .bar {
+    display: block;
+    height: 100%; width: 0; background: var(--dim);
+    transition: width .6s cubic-bezier(.2,.8,.25,1);
+  }
+  .lat-row .val { text-align: right; color: var(--cream); }
+  .lat-row.hero .lbl, .lat-row.hero .val { color: var(--yellow); font-weight: 700; }
+  .lat-row.hero .bar { background: var(--yellow); box-shadow: var(--glow); }
+  .lat-row.net .lbl, .lat-row.net .val { color: var(--pink); }
+  .lat-row.net .bar { background: var(--pink); }
+  /* User-time rows are visually demoted: they are context, not system cost. */
+  .lat-row.user .lbl, .lat-row.user .val { color: var(--dim); font-style: italic; }
+  .lat-row.user .bar { background: repeating-linear-gradient(45deg,
+      rgba(255,251,232,.30) 0 3px, transparent 3px 6px); }
+  .lat-row.sum { border-top: 1px solid var(--line); margin-top: 6px; padding-top: 7px; }
+  .lat-row.sum .lbl, .lat-row.sum .val { color: var(--cream); font-weight: 700; }
+  .lat-row .lbl.child { padding-left: 14px; }
+
+  .caption { color: var(--dim); font-size: 12px; margin-top: 14px; line-height: 1.55; }
+  .caption b { color: var(--yellow); font-weight: 700; }
+
+  .hidden { display: none; }
+
+  @media (max-width: 560px) {
+    .lat-row { grid-template-columns: 132px 1fr 60px; font-size: 11.5px; }
+    /* The meter needs real width to be readable at all: a 93px track cannot
+       show a fill and a threshold marker apart. Stack it instead of shrinking. */
+    .meter-row {
+      display: block; margin-top: 30px;
+    }
+    /* 20px, not 5px: the marker's "gate 0.xxxx" label is absolutely positioned
+       17px above the bar and collided with this row label at the tighter gap. */
+    .meter-row .lbl { display: block; margin-bottom: 20px; }
+    .meter-row .val { display: block; text-align: right; margin-top: 3px; }
+    .node { min-width: 74px; font-size: 10px; }
+    .mic-row { gap: 10px; }
+    #mic { width: 100%; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <h1>Ask <span class="accent">HH&nbsp;Goa</span></h1>
+    <div class="sub">
+      Speak a question about Hacker House Goa 2026 and get an answer grounded in
+      hhgoa.com — retrieved locally in single-digit milliseconds, cited, and
+      refused outright when the corpus doesn't contain it.
+    </div>
+    <div class="hash">#RAGInGoa</div>
+  </header>
+
+  <!-- ------------------------------------------------------------- ask --- -->
+  <div class="panel">
+    <div class="mic-row">
+      <button id="mic">Speak</button>
+      <canvas id="wave" width="640" height="52"></canvas>
+      <button id="stop" disabled>Stop</button>
+      <button id="diag" title="Isolate why voice input is failing">Diagnose</button>
+    </div>
+    <!-- Always visible. The single most common confusion with this page is not
+         knowing WHICH browser is running it -- an in-app preview pane looks
+         like a browser but is an Electron shell that can never do speech. -->
+    <div id="engineBadge" class="engine"></div>
+    <pre id="diagOut" class="diag hidden"></pre>
+
+    <div class="transcript" id="transcript"></div>
+    <div id="sttNote" class="note hidden"></div>
+
+    <div class="fallback">
+      <input id="typed" placeholder="…or type it (fallback)" maxlength="500" autocomplete="off">
+      <button id="send">Ask</button>
+    </div>
+
+    <div class="chips" id="examples"></div>
+  </div>
+
+  <!-- ---------------------------------------------------------- setup ---- -->
+  <!-- Shown on first visit, then collapsed to a one-line summary. The key is
+       OPTIONAL everywhere: with none, the service answers extractively from the
+       retrieved passage, which is the same degraded path it uses when quota
+       runs out. Nothing here gates the pipeline. -->
+  <div class="panel" id="setupCard">
+    <h2>Setup <span class="pill" id="setupPill"></span></h2>
+
+    <div id="setupBody">
+      <label class="field">
+        <span>API endpoint</span>
+        <input id="apiBase" placeholder="same origin (leave blank)" autocomplete="off">
+        <small>Blank = this server. Set it when the page is hosted apart from
+          the API (e.g. on Netlify, which cannot run the Python backend).</small>
+      </label>
+
+      <label class="field">
+        <span>Gemini API key <em>(optional)</em></span>
+        <input id="apiKey" type="password" placeholder="AIza… — leave blank to run without"
+               autocomplete="off" spellcheck="false">
+        <small>
+          <b>Entirely optional.</b> Without it the app still retrieves, cites and
+          refuses — answers are the retrieved passage verbatim (extractive mode)
+          rather than written prose. With it, answers are generated and grounded.
+          Get one free at <a href="https://aistudio.google.com/apikey"
+          target="_blank" rel="noopener noreferrer">aistudio.google.com/apikey</a>
+          (39 chars, starts with <code>AIza</code>).
+        </small>
+        <small class="warn-text">
+          Stored only in this browser's localStorage and sent to the API endpoint
+          above as a header, per request — never logged, never persisted server-side.
+          On a shared or public machine, use <b>Session only</b>.
+        </small>
+      </label>
+
+      <div class="setup-actions">
+        <button id="setupSave">Save &amp; continue</button>
+        <button id="setupSession">Session only</button>
+        <button id="setupSkip">Continue without a key</button>
+        <button id="setupClear">Clear key</button>
+      </div>
+      <div id="setupMsg" class="note hidden"></div>
+    </div>
+  </div>
+
+  <!-- -------------------------------------------------------- pipeline --- -->
+  <div class="panel deep hidden" id="pipeCard">
+    <h2>Pipeline</h2>
+    <div class="pipe" id="pipe"></div>
+    <div class="meter hidden" id="meterWrap">
+      <div class="lat-row meter-row">
+        <span class="lbl">retrieval confidence</span>
+        <div class="meter-bar">
+          <div class="meter-fill" id="meterFill"></div>
+          <div class="meter-mark" id="meterMark" data-label="gate"></div>
+        </div>
+        <span class="val" id="meterVal"></span>
+      </div>
+      <div class="meter-scale"><span>0.70</span><span>cosine</span><span>0.95</span></div>
+      <div class="caption" id="meterNote"></div>
+    </div>
+  </div>
+
+  <!-- ---------------------------------------------------------- answer --- -->
+  <div class="panel cream hidden" id="answerCard">
+    <h2>Answer <span id="modeBadge" class="badge"></span></h2>
+    <div class="answer" id="answer"></div>
+    <div id="modeNote" class="note hidden"></div>
+    <ul class="cites" id="cites"></ul>
+    <div style="margin-top:16px">
+      <button id="replay" style="border-color:var(--green); color:var(--green)">Speak it again</button>
+    </div>
+  </div>
+
+  <!-- --------------------------------------------------------- latency --- -->
+  <div class="panel deep hidden" id="latencyCard">
+    <h2>Latency</h2>
+    <div id="latency"></div>
+    <div class="caption">
+      Reported per stage on purpose. The engineered claim is the
+      <b>retrieval subtotal</b> — embed, vector search, BM25 fusion, all local
+      and in-process. Speech recognition is a browser service and generation is
+      a network call to a free-tier API; neither can be made sub-200ms, so
+      neither is hidden inside one flattering number.
+    </div>
+  </div>
+
+</div>
+
+<!-- API_BASE_PLACEHOLDER — netlify/inject-api-base.sh rewrites this line at
+     deploy time to set window.__API_BASE__. Left inert when unset so the page
+     falls back to same-origin, which is correct when the API serves it. -->
+<script>
+"use strict";
+
+const $ = (id) => document.getElementById(id);
+const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+
+const EXAMPLES = [
+  "when does registration begin",
+  "is there a registration fee",
+  "how are teams formed",
+  "what is task 2 about",
+  "how many builders attend",
+  "what is the wifi password",
+];
+
+/* Cosine window the display maps onto. bge-small-en scores on this corpus sit
+   in roughly 0.70-0.95; a 0-1 bar would squash every result into a stripe and
+   hide the very overlap the calibration work is about. */
+const COS_MIN = 0.70, COS_MAX = 0.95;
+
+/* STT timing, split three ways on purpose.
+   Timing from recog.start() to the final result measures the USER -- dead air
+   before they speak, plus however long they talk. An early build reported that
+   as "speech-to-text 5703ms", which is not a system cost at all and overstated
+   the pipeline by an order of magnitude on the one panel whose whole job is
+   being honest about latency.
+     holdMs    button press -> final result   (wall clock the user feels)
+     utterMs   speech start -> speech end     (the user talking; not our cost)
+     sttMs     speech END   -> final result   (the recognizer's actual latency) */
+let recog = null, listening = false;
+let tListenStart = 0, tSpeechStart = 0, tSpeechEnd = 0;
+let sttMs = null, utterMs = null, holdMs = null;
+let audioCtx = null, analyser = null, micStream = null, rafId = null;
+let typeTimer = null, netRetried = false;
+
+/* --------------------------------------------------------------- engine ---
+   IMPORTANT, and easy to get wrong: Chrome's SpeechRecognition is NOT
+   on-device. It streams the audio to Google's speech backend, and that request
+   is only accepted from builds carrying Google's API key -- i.e. Google Chrome
+   and Edge. Plain Chromium, Electron shells, and most Chromium forks expose the
+   `SpeechRecognition` interface but get their request rejected, which surfaces
+   as the useless-looking `error: "network"`.
+
+   So feature-detecting `window.SpeechRecognition` is not enough: the object
+   exists and still cannot work. We check the browser BRAND and warn up front,
+   because failing on click with a bare error code is the worst version of this. */
+function speechEngine() {
+  const brands = (navigator.userAgentData && navigator.userAgentData.brands) || [];
+  const names = brands.map((b) => b.brand).join(" ");
+  if (/Google Chrome/i.test(names)) return "chrome";
+  if (/Microsoft Edge/i.test(names)) return "edge";
+  if (brands.length) return "chromium-like";   // Chromium, Electron, forks
+  // No userAgentData (Firefox, Safari): fall back to the UA string.
+  const ua = navigator.userAgent;
+  if (/Edg\//.test(ua)) return "edge";
+  if (/Chrome\//.test(ua) && !/Chromium/.test(ua)) return "chrome";
+  return "unknown";
+}
+
+function diagnose() {
+  return "engine=" + speechEngine() +
+         " · secure=" + window.isSecureContext +
+         " · online=" + navigator.onLine +
+         " · origin=" + location.origin;
+}
+
+/* ---------------------------------------------------------------- waveform */
+/* A second getUserMedia stream alongside the one SpeechRecognition opens.
+   Desktop Chrome allows both; if it refuses we lose only the visual, so a
+   failure here must never block the actual question. */
+/* The waveform opens a SECOND mic stream alongside the one SpeechRecognition
+   uses. That is a variable this page introduced, and on some setups a
+   concurrent capture disturbs recognition — so it is disableable with ?wave=0
+   to isolate it without editing code. */
+const WAVE_ON = new URLSearchParams(location.search).get("wave") !== "0";
+
+async function startWave() {
+  if (!WAVE_ON) { idleWave(); return; }
+  try {
+    micStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    const src = audioCtx.createMediaStreamSource(micStream);
+    analyser = audioCtx.createAnalyser();
+    analyser.fftSize = 512;
+    src.connect(analyser);
+    drawWave();
+  } catch (e) {
+    console.warn("waveform unavailable:", e);
+  }
+}
+
+function stopWave() {
+  if (rafId) cancelAnimationFrame(rafId);
+  rafId = null;
+  if (micStream) micStream.getTracks().forEach((t) => t.stop());
+  if (audioCtx) audioCtx.close();
+  micStream = audioCtx = analyser = null;
+  idleWave();
+}
+
+/* An empty canvas next to a live-looking button reads as broken, so idle draws
+   a flat baseline: the instrument is present and silent, not missing. */
+function idleWave() {
+  const c = $("wave"), g = c.getContext("2d");
+  g.clearRect(0, 0, c.width, c.height);
+  const BARS = 56, bw = c.width / BARS;
+  g.fillStyle = "#FEE101";
+  g.globalAlpha = 0.22;
+  for (let i = 0; i < BARS; i++) g.fillRect(i * bw + 1, c.height / 2 - 1, bw - 2, 2);
+  g.globalAlpha = 1;
+}
+
+function drawWave() {
+  const c = $("wave"), g = c.getContext("2d");
+  const bins = analyser.frequencyBinCount;
+  const buf = new Uint8Array(bins);
+  const BARS = 56;
+  const tick = () => {
+    rafId = requestAnimationFrame(tick);
+    analyser.getByteFrequencyData(buf);
+    g.clearRect(0, 0, c.width, c.height);
+    const bw = c.width / BARS;
+    for (let i = 0; i < BARS; i++) {
+      /* Log-ish bin pick so low frequencies don't dominate the display. */
+      const v = buf[Math.floor((i / BARS) ** 1.6 * bins)] / 255;
+      const h = Math.max(2, v * c.height * 0.95);
+      g.fillStyle = v > 0.55 ? "#FF0080" : "#FEE101";
+      g.globalAlpha = 0.35 + v * 0.65;
+      g.fillRect(i * bw + 1, (c.height - h) / 2, bw - 2, h);
+    }
+    g.globalAlpha = 1;
+  };
+  tick();
+}
+
+/* ------------------------------------------------------------------- speech */
+function initSpeech() {
+  if (!SR) {
+    $("mic").disabled = true;
+    $("stop").disabled = true;
+    show($("sttNote"),
+      "This browser has no Web Speech API (Chrome and Edge do). Voice input is " +
+      "disabled — the typed box is a fallback so the retrieval pipeline stays " +
+      "testable, but voice is the intended path.");
+    return;
+  }
+  if (!window.isSecureContext) {
+    show($("sttNote"),
+      "Microphone access needs HTTPS or localhost — voice will fail on a plain " +
+      "http:// origin. (" + diagnose() + ")");
+  } else if (["chromium-like", "unknown"].includes(speechEngine())) {
+    /* Warn BEFORE the click. The API object exists here but the backend will
+       reject the request, so waiting for the failure just wastes the attempt. */
+    show($("sttNote"),
+      "Heads up: this looks like a Chromium build that isn't Google Chrome or " +
+      "Edge (Brave, plain Chromium, or an in-app/Electron browser). Speech " +
+      "recognition streams audio to Google's servers and those builds don't " +
+      "carry the required API key, so it will fail with a 'network' error no " +
+      "matter what the page does. Open this in Chrome or Edge for the voice " +
+      "path; the typed box works everywhere. (" + diagnose() + ")");
+  }
+
+  recog = new SR();
+  recog.lang = "en-IN";
+  recog.interimResults = true;
+  recog.continuous = false;
+  recog.maxAlternatives = 1;
+
+  recog.onspeechstart = () => { tSpeechStart = performance.now(); };
+  recog.onspeechend = () => { tSpeechEnd = performance.now(); };
+
+  recog.onresult = (ev) => {
+    let final = "", interim = "";
+    for (let i = ev.resultIndex; i < ev.results.length; i++) {
+      const t = ev.results[i][0].transcript;
+      if (ev.results[i].isFinal) final += t; else interim += t;
+    }
+    if (interim) {
+      $("transcript").innerHTML = '<span class="interim">' + esc(interim) + "</span>";
+    }
+    if (final.trim()) {
+      netRetried = false;   // recognition works; re-arm the one-shot retry
+      const now = performance.now();
+      holdMs = now - tListenStart;
+      utterMs = tSpeechStart && tSpeechEnd ? tSpeechEnd - tSpeechStart : null;
+      /* Fall back to hold time only if the engine never fired speechend, and
+         label it as such rather than passing it off as recognizer latency. */
+      sttMs = tSpeechEnd ? now - tSpeechEnd : null;
+      $("transcript").textContent = final.trim();
+      ask(final.trim());
+    }
+  };
+
+  recog.onerror = (ev) => {
+    setListening(false);
+
+    /* `network` is genuinely transient sometimes, so retry ONCE before
+       explaining. Retrying more than once just spins: if the build has no API
+       key it will fail identically forever. */
+    if (ev.error === "network" && !netRetried) {
+      netRetried = true;
+      show($("sttNote"), "Speech service unreachable — retrying once…");
+      setTimeout(startListening, 500);
+      return;
+    }
+
+    const engine = speechEngine();
+    const MESSAGES = {
+      "not-allowed":
+        "Microphone permission denied. Allow it for this site in the browser's " +
+        "address-bar permissions, then try again.",
+      "service-not-allowed":
+        "The browser refused to use its speech service. This usually means a " +
+        "Chromium build without Google's speech API key — try Chrome or Edge.",
+      "no-speech":
+        "Didn't catch anything. Try again, a little closer to the mic.",
+      "audio-capture":
+        "No microphone found, or another app has exclusive hold of it.",
+      "aborted":
+        "Listening was cancelled.",
+      "network":
+        "You are in: " + engine + ".  Voice needs: Google Chrome or Edge.\n\n" +
+        "Speech recognition failed to reach its backend.\n\n" +
+        "Chrome's Web Speech API is NOT on-device — it uploads audio to " +
+        "Google's servers, and only builds carrying Google's API key are " +
+        "allowed to. " +
+        (engine === "chrome" || engine === "edge"
+          ? "This build should be allowed, so the likely cause is a firewall, " +
+            "VPN or proxy blocking the speech endpoint, or being offline."
+          : "This build (" + engine + ") is not Google Chrome or Edge, so the " +
+            "request is rejected outright. Open the page in Chrome or Edge.") +
+        "\n\nThe typed box below works regardless and exercises the identical " +
+        "retrieval pipeline.",
+    };
+
+    show($("sttNote"),
+      (MESSAGES[ev.error] || "Speech recognition error: " + ev.error) +
+      "\n\n" + diagnose());
+    $("sttNote").style.whiteSpace = "pre-wrap";
+    $("typed").focus();
+  };
+
+  recog.onend = () => setListening(false);
+}
+
+function setListening(on) {
+  listening = on;
+  $("mic").classList.toggle("live", on);
+  $("mic").textContent = on ? "Listening" : "Speak";
+  $("stop").disabled = !on;
+  if (on) startWave(); else stopWave();
+}
+
+function startListening() {
+  if (!recog || listening) return;
+  hide($("sttNote"));
+  $("transcript").textContent = "";
+  sttMs = utterMs = holdMs = null;
+  tSpeechStart = tSpeechEnd = 0;
+  tListenStart = performance.now();
+  try { recog.start(); setListening(true); }
+  catch (e) { console.warn(e); }
+}
+
+/* --------------------------------------------------------------- settings
+   Two knobs, both optional, both resolvable without touching code:
+
+     apiBase  where /ask lives. Blank = same origin. Needed because the page
+              can be hosted apart from the API -- Netlify cannot run the Python
+              backend (see DEPLOY.md), so the static frontend has to be told
+              where the API actually is.
+     apiKey   a Gemini key. OPTIONAL. Without one the pipeline runs in full and
+              answers extractively; with one, answers are generated.
+
+   Resolution order lets a deployment pin values without a rebuild:
+     ?api= / ?key= query param  >  localStorage  >  sessionStorage
+       >  window.__API_BASE__ (injected at build)  >  same origin
+   A key given via ?key= is consumed and stripped from the URL immediately --
+   credentials do not belong in a URL that lands in history or a referrer. */
+const LS_BASE = "hhgoa.apiBase", LS_KEY = "hhgoa.apiKey";
+let apiBase = "", apiKey = "";
+
+function loadSettings() {
+  const qp = new URLSearchParams(location.search);
+
+  const qpKey = qp.get("key");
+  apiKey = qpKey || localStorage.getItem(LS_KEY) || sessionStorage.getItem(LS_KEY) || "";
+  if (qpKey) {
+    sessionStorage.setItem(LS_KEY, qpKey);
+    qp.delete("key");
+    const q = qp.toString();
+    history.replaceState({}, "", location.pathname + (q ? "?" + q : "") + location.hash);
+  }
+
+  apiBase = (qp.get("api") || localStorage.getItem(LS_BASE) ||
+             window.__API_BASE__ || "").replace(/\/+$/, "");
+}
+
+function url(path) { return (apiBase || "") + path; }
+
+function renderSetup(collapsed) {
+  const card = $("setupCard"), pill = $("setupPill");
+  if (apiKey) {
+    pill.className = "pill good";
+    pill.textContent = "generated answers";
+  } else {
+    pill.className = "pill raw";
+    pill.textContent = "extractive — no key";
+  }
+  if (apiBase) pill.textContent += "  ·  " + apiBase;
+  card.classList.toggle("done", !!collapsed);
+  if (collapsed && !card.querySelector(".edit")) {
+    const edit = document.createElement("span");
+    edit.className = "edit";
+    edit.textContent = "change";
+    edit.addEventListener("click", () => card.classList.remove("done"));
+    $("setupPill").after(edit);
+  }
+}
+
+function saveSettings(store) {
+  apiKey = $("apiKey").value.trim();
+  apiBase = $("apiBase").value.trim().replace(/\/+$/, "");
+
+  localStorage.removeItem(LS_KEY);
+  sessionStorage.removeItem(LS_KEY);
+  if (apiKey) (store === "session" ? sessionStorage : localStorage).setItem(LS_KEY, apiKey);
+  apiBase ? localStorage.setItem(LS_BASE, apiBase) : localStorage.removeItem(LS_BASE);
+
+  // Shape check only -- we never validate a key by spending a request on it.
+  // Wrong-looking keys are the single most common setup mistake here: the one
+  // in .env was 53 chars because it was a Vertex/service credential, not an
+  // AI Studio key, and every call 401'd.
+  if (apiKey && !/^AIza[\w-]{30,}$/.test(apiKey)) {
+    show($("setupMsg"),
+      "Saved, but that doesn't look like a Google AI Studio key — those are 39 " +
+      "characters and start with 'AIza'. A Vertex AI or service-account " +
+      "credential will 401 on every call. The app will fall back to extractive " +
+      "mode if it does.");
+  } else {
+    hide($("setupMsg"));
+  }
+  renderSetup(true);
+  localStorage.setItem("hhgoa.setupSeen", "1");
+}
+
+/* ---------------------------------------------------------------------- ask */
+async function ask(query) {
+  if (!query || !query.trim()) return;
+  clearTimeout(typeTimer);
+  window.speechSynthesis && window.speechSynthesis.cancel();
+
+  $("answerCard").classList.remove("hidden");
+  $("answer").textContent = "…";
+  $("modeBadge").textContent = "";
+  $("modeBadge").className = "badge";
+  $("cites").innerHTML = "";
+  hide($("modeNote"));
+
+  const t0 = performance.now();
+  let data;
+  try {
+    const headers = { "Content-Type": "application/json" };
+    // Optional. Sent as a header, never a query param: a key in a URL leaks
+    // into history, logs and Referer.
+    if (apiKey) headers["X-Gemini-Key"] = apiKey;
+    const res = await fetch(url("/ask"), {
+      method: "POST",
+      headers,
+      body: JSON.stringify({ query }),
+    });
+    if (!res.ok) throw new Error("HTTP " + res.status);
+    data = await res.json();
+  } catch (e) {
+    $("answer").textContent = "Request failed: " + e.message;
+    $("modeBadge").textContent = "error";
+    $("modeBadge").className = "badge b-error";
+    return;
+  }
+
+  render(data, performance.now() - t0);
+  if (data.answered) speak(data.answer);
+}
+
+function render(d, roundTrip) {
+  const badge = $("modeBadge");
+  badge.textContent = d.mode;
+  badge.className = "badge b-" + d.mode;
+
+  typewrite($("answer"), d.answer);
+
+  if (d.mode === "extractive") {
+    show($("modeNote"),
+      /* Drive this from the server's OWN reason, not from whether the browser
+         happens to hold a key. The server may carry its own key and have it
+         rejected — saying "no API key" there would send someone hunting for a
+         setting that is already set. */
+      ({
+        no_api_key: "Extractive mode — no API key anywhere, so this is ",
+        client_error: "Extractive mode — the API key was REJECTED (401/403). " +
+          "AI Studio keys are 39 chars starting 'AIza'; a Vertex or " +
+          "service-account credential fails exactly like this. So this is ",
+        rate_limited: "Extractive mode — the free-tier quota is spent, so this is ",
+        rate_limit_wait_exceeded:
+          "Extractive mode — the request would have waited past its timeout " +
+          "behind the rate limiter, so this is ",
+        timeout: "Extractive mode — generation timed out, so this is ",
+      }[(d.guardrails && d.guardrails.degraded && d.guardrails.degraded.reason)] ||
+        "Extractive mode — generation unavailable, so this is ") +
+      "the top retrieved passage verbatim rather than written prose. Retrieval, " +
+      "citations and every guardrail still ran; only the wording step is skipped. " +
+      "It is the same path the service degrades to under quota exhaustion, which " +
+      "is why it stays exercised rather than untested." +
+      (apiKey ? "" : "  Add your own key in Setup above for generated answers."));
+  } else if (d.mode === "refused") {
+    show($("modeNote"),
+      "Refused on purpose. Knowing when not to answer is the point — the gate " +
+      "that fired is shown in the pipeline above.");
+  }
+
+  renderCitations(d.citations || []);
+  renderPipeline(d);
+  renderLatency(d, roundTrip);
+}
+
+function renderCitations(cites) {
+  const ul = $("cites");
+  ul.innerHTML = "";
+  cites.forEach((c, i) => {
+    const li = document.createElement("li");
+    li.style.animationDelay = (i * 45) + "ms";
+    const a = document.createElement("a");
+    a.href = c.url; a.target = "_blank"; a.rel = "noopener noreferrer";
+    a.textContent = (i + 1) + ". " + c.title;
+    const meta = document.createElement("span");
+    meta.className = "meta";
+    meta.textContent = c.doc_id + " · cos " + c.score.toFixed(4);
+    li.append(a, meta);
+    ul.appendChild(li);
+  });
+
+  /* Under hybrid retrieval the ORDER comes from RRF fusion while the score
+     shown is the unchanged dense cosine, so the list is legitimately not
+     sorted by the number beside it. Without saying so, that reads as a
+     sorting bug -- and quietly re-sorting by cosine would misrepresent the
+     ranking the answer was actually built from. */
+  const outOfOrder = cites.some((c, i) => i && c.score > cites[i - 1].score);
+  const note = document.createElement("li");
+  note.style.cssText = "border-left-color:transparent;background:none;font-size:11.5px;" +
+                       "opacity:.72;display:block;padding-left:0";
+  if (outOfOrder) {
+    note.textContent =
+      "Ordered by hybrid rank (BM25 + dense fused with RRF), not by cosine — " +
+      "which is why the scores below are not descending. The cosine shown is " +
+      "the unmodified dense score, kept honest rather than rewritten to match " +
+      "the ordering.";
+    ul.appendChild(note);
+  }
+}
+
+/* --------------------------------------------------------------- pipeline */
+function renderPipeline(d) {
+  $("pipeCard").classList.remove("hidden");
+  const gr = d.guardrails || {};
+  const box = $("pipe");
+  box.innerHTML = "";
+
+  const scope = gr.scope, vocab = gr.vocabulary, score = gr.score, ground = gr.groundedness;
+  const stages = [
+    { key: "scope", label: "Scope",
+      state: !scope ? "skip" : scope.ok ? "pass" : "stop",
+      note: scope ? scope.reason : "—" },
+    /* The vocabulary gate runs AFTER retrieval, so its presence proves
+       retrieval ran even when citations are empty — they are suppressed
+       deliberately on a vocabulary refusal, because citing sources for
+       keyboard mash would be worse than citing nothing. Without this, the
+       node read "Retrieve STOP 0 docs" and blamed the wrong stage. */
+    { key: "retrieve", label: "Retrieve",
+      state: scope && !scope.ok ? "skip"
+           : (d.citations || []).length || vocab ? "pass" : "stop",
+      note: (d.citations || []).length
+              ? (d.citations.length + " docs")
+              : vocab ? "ran (cites withheld)" : "0 docs" },
+    { key: "vocab", label: "Vocabulary",
+      state: !vocab ? "skip" : vocab.ok ? "pass" : "stop",
+      note: vocab ? (vocab.term_hits + "/" + (vocab.query_terms ?? "?") + " terms")
+                  : "—" },
+    { key: "score", label: "Score gate",
+      state: !score ? "skip" : score.ok ? "pass" : "stop",
+      note: score ? (score.top_score !== undefined ? score.top_score : score.reason) : "—" },
+    { key: "generate", label: "Generate",
+      state: d.mode === "generated" ? "pass" : gr.degraded ? "warn" : "skip",
+      note: gr.degraded ? gr.degraded.reason : d.mode === "generated" ? "ok" : "—" },
+    { key: "ground", label: "Grounded",
+      state: !ground ? "skip" : ground.ok ? "pass" : "stop",
+      note: ground ? ground.reason.replace(/_/g, " ") : "—" },
+  ];
+
+  stages.forEach((s, i) => {
+    const el = document.createElement("div");
+    el.className = "node " + s.state;
+    el.style.animationDelay = (i * 70) + "ms";
+    el.innerHTML = '<span class="dot"></span>' + esc(s.label) +
+                   "<small>" + esc(String(s.note)) + "</small>";
+    box.appendChild(el);
+  });
+
+  renderConfidence(score);
+}
+
+function renderConfidence(score) {
+  const wrap = $("meterWrap");
+  if (!score || score.top_score === undefined) { wrap.classList.add("hidden"); return; }
+  wrap.classList.remove("hidden");
+
+  const pct = (v) => Math.max(0, Math.min(100, ((v - COS_MIN) / (COS_MAX - COS_MIN)) * 100));
+  const fill = $("meterFill");
+  fill.classList.toggle("under", !score.ok);
+  /* Next frame so the width transition actually animates from 0. */
+  requestAnimationFrame(() => { fill.style.width = pct(score.top_score) + "%"; });
+
+  if (score.threshold !== undefined) {
+    $("meterMark").style.left = pct(score.threshold) + "%";
+    $("meterMark").dataset.label = "gate " + score.threshold;
+    $("meterMark").style.display = "";
+  } else {
+    $("meterMark").style.display = "none";
+  }
+
+  $("meterVal").textContent = Number(score.top_score).toFixed(4);
+  $("meterNote").innerHTML = score.ok
+    ? "Above the calibrated gate, so generation is worth attempting. Note this is " +
+      "a <b>cost filter, not proof the answer exists</b> — the answerable and " +
+      "must-refuse score distributions overlap, so groundedness does the real work."
+    : "Below the gate — refused without spending a generation call at all.";
+}
+
+/* ---------------------------------------------------------------- latency */
+function renderLatency(d, roundTrip) {
+  $("latencyCard").classList.remove("hidden");
+  const t = d.timings_ms || {};
+  const failed = !!(d.guardrails && d.guardrails.degraded);
+
+  const rows = [
+    /* User time, shown for context and explicitly NOT counted as system cost. */
+    ["you speaking (not system time)", utterMs, "user", false],
+    ["speech recognition (after you stop)", sttMs, "", false],
+    ["scope filter", t.scope, "", false],
+    ["embed query", t.retrieval_embed, "", true],
+    ["vector search + BM25 fusion", t.retrieval_search, "", true],
+    ["collapse to parents", t.retrieval_dedupe, "", true],
+    ["retrieval subtotal", t.retrieval_total, "hero", false],
+    /* Server key is `generate`, recorded even when the call FAILS. A failed
+       Gemini call still costs its whole network round trip; omitting it would
+       hide the largest number on the page behind "server total". */
+    [failed ? "generation (network, FAILED)" : "generation (network)", t.generate, "net", false],
+    ["groundedness check", t.groundedness, "", false],
+    ["server total", t.total, "sum", false],
+    ["browser round trip", roundTrip, "sum", false],
+    ["mic press → answer (wall clock)", holdMs, "user sum", false],
+  ].filter(([, v]) => v !== undefined && v !== null);
+
+  /* Scale against the largest individual STAGE — excluding user time and the
+     `sum` rows, which are aggregates of the others and would double-count.
+     Real stages then stay comparable to each other, and the totals simply
+     clamp at 100%. Retrieval still renders as a sliver next to generation:
+     that is the honest picture and precisely the point of the panel. */
+  const max = Math.max(
+    ...rows
+      .filter(([, , cls]) => !/user|sum/.test(String(cls)))
+      .map(([, v]) => Number(v)),
+    1);
+
+  $("latency").innerHTML = rows.map(([label, val, cls, child]) =>
+    '<div class="lat-row ' + cls + '">' +
+      '<span class="lbl' + (child ? " child" : "") + '">' + esc(label) + "</span>" +
+      '<span class="track"><span class="bar" data-w="' +
+        Math.min(100, Number(val) / max * 100).toFixed(2) + '"></span></span>' +
+      '<span class="val">' + Number(val).toFixed(2) + "</span>" +
+    "</div>"
+  ).join("");
+
+  requestAnimationFrame(() => {
+    $("latency").querySelectorAll(".bar").forEach((b) => { b.style.width = b.dataset.w + "%"; });
+  });
+}
+
+/* -------------------------------------------------------------- typewriter */
+function typewrite(el, text) {
+  clearTimeout(typeTimer);
+  el.textContent = "";
+  const caret = document.createElement("span");
+  caret.className = "caret";
+  el.appendChild(caret);
+  let i = 0;
+  /* Fixed total duration rather than fixed per-character delay, so a long
+     passage in extractive mode doesn't crawl for ten seconds. */
+  const step = Math.max(6, Math.min(22, 900 / Math.max(text.length, 1)));
+  const tick = () => {
+    i += Math.ceil(text.length / 90) || 1;
+    caret.insertAdjacentText("beforebegin", text.slice(el.textContent.length, i));
+    if (i < text.length) typeTimer = setTimeout(tick, step);
+    else caret.remove();
+  };
+  tick();
+}
+
+/* ------------------------------------------------------------------ speak */
+/* getVoices() is populated ASYNCHRONOUSLY. Chrome returns an empty list on the
+   first synchronous call and fills it later, firing `voiceschanged`. An earlier
+   version of speak() gated on getVoices().length and so refused to speak at all
+   in real Chrome -- the guard meant to catch silent failure caused one.
+   Some engines never fire the event, so poll briefly as well. */
+let voicesReady = false;
+
+function waitForVoices(timeoutMs = 2500) {
+  const synth = window.speechSynthesis;
+  if (!synth) return Promise.resolve(0);
+  return new Promise((resolve) => {
+    const n = () => synth.getVoices().length;
+    if (n()) { voicesReady = true; return resolve(n()); }
+    let done = false;
+    const finish = () => {
+      if (done) return;
+      done = true;
+      clearInterval(poll);
+      synth.removeEventListener && synth.removeEventListener("voiceschanged", finish);
+      voicesReady = n() > 0;
+      resolve(n());
+    };
+    synth.addEventListener && synth.addEventListener("voiceschanged", finish);
+    const poll = setInterval(() => { if (n()) finish(); }, 150);
+    setTimeout(finish, timeoutMs);
+  });
+}
+
+/* Never gate on the voice list. Attempt playback and detect REAL silence
+   instead: if nothing started and nothing is speaking shortly after, report. */
+function speak(text) {
+  const synth = window.speechSynthesis;
+  if (!synth) return;
+  synth.cancel();
+
+  const u = new SpeechSynthesisUtterance(text);
+  u.lang = "en-IN";
+  u.rate = 1.05;
+
+  let started = false;
+  u.onstart = () => { started = true; };
+  u.onerror = (ev) => reportNoTTS(ev.error);
+  synth.speak(u);
+
+  setTimeout(() => {
+    if (!started && !synth.speaking && !synth.pending) reportNoTTS("no voices installed");
+  }, 1500);
+}
+
+function reportNoTTS(why) {
+  show($("sttNote"),
+    "Answer playback didn't start (" + why + "). The answer is shown above — " +
+    "this affects speech output only, not retrieval.\n\n" + diagnose());
+  $("sttNote").style.whiteSpace = "pre-wrap";
+}
+
+/* ------------------------------------------------------------- diagnostics
+   `network` from SpeechRecognition is a catch-all that hides at least four
+   different causes. Rather than guess, isolate them one at a time and let the
+   page report which one actually applies. */
+async function runDiagnostics() {
+  const out = $("diagOut");
+  out.classList.remove("hidden");
+  const lines = [];
+  const push = (label, ok, detail) => {
+    lines.push('<span class="' + (ok === null ? "" : ok ? "ok" : "bad") + '">' +
+      (ok === null ? "·" : ok ? "PASS" : "FAIL") + "</span>  " +
+      esc(label) + (detail ? "  — " + esc(detail) : ""));
+    out.innerHTML = lines.join("\n");
+  };
+
+  out.textContent = "running…";
+  lines.length = 0;
+
+  /* 1. environment */
+  const engine = speechEngine();
+  push("browser engine", engine === "chrome" || engine === "edge", engine);
+  push("secure context", window.isSecureContext, location.origin);
+  push("navigator.onLine", navigator.onLine, "");
+  push("SpeechRecognition present", !!SR, "");
+
+  /* Must AWAIT this. Reading getVoices() synchronously reports 0 in Chrome
+     even when voices exist, because the list is filled asynchronously -- which
+     is exactly the false negative this diagnostic reported on its first run. */
+  const nVoices = await waitForVoices();
+  push("speechSynthesis voices", nVoices > 0,
+       nVoices + " voices" + (nVoices ? "" : " (checked after voiceschanged + 2.5s poll)"));
+
+  /* 2. can we open the mic at all? Distinguishes a permission/device problem
+        from a speech-service problem. */
+  try {
+    const st = await navigator.mediaDevices.getUserMedia({ audio: true });
+    push("microphone opens", true, st.getAudioTracks()[0]?.label || "unnamed device");
+    st.getTracks().forEach((t) => t.stop());
+  } catch (e) {
+    push("microphone opens", false, e.name + ": " + e.message);
+  }
+
+  /* 3. is Google reachable at all? A corporate proxy, VPN, DNS filter or
+        extension blocking Google is the most common cause of `network` in a
+        build that IS allowed to use the service. no-cors, so we only learn
+        reachable/not -- which is exactly the bit we need. */
+  try {
+    await fetch("https://www.google.com/generate_204", { mode: "no-cors", cache: "no-store" });
+    push("google.com reachable", true, "");
+  } catch (e) {
+    push("google.com reachable", false, "blocked by network, proxy or extension");
+  }
+
+  /* 4. a bare recognizer: default language, and NO concurrent getUserMedia
+        stream. The waveform opens a second mic stream, which is a variable
+        this page introduced -- this probe removes it. */
+  if (SR) {
+    const verdict = await new Promise((res) => {
+      let done = false;
+      const finish = (v) => { if (!done) { done = true; res(v); } };
+      let r;
+      try { r = new SR(); } catch (e) { return finish("construct failed: " + e.message); }
+      r.lang = "en-US";
+      r.interimResults = false;
+      r.onerror = (ev) => finish("error:" + ev.error);
+      r.onresult = () => finish("got a result");
+      r.onend = () => finish("ended cleanly (service reachable)");
+      try { r.start(); } catch (e) { return finish("start failed: " + e.message); }
+      setTimeout(() => { try { r.abort(); } catch (_) {} finish("no error within 7s (service reachable)"); }, 7000);
+    });
+    /* Three-way, not two. `not-allowed` / `audio-capture` mean we never got as
+       far as contacting the speech service, so they are INCONCLUSIVE about it
+       — scoring them as "reachable" would send you chasing the wrong cause. */
+    const blocked = /error:(network|service-not-allowed)/.test(verdict);
+    const inconclusive = /error:(not-allowed|audio-capture)/.test(verdict);
+    push("bare recognizer, en-US, no waveform",
+         blocked ? false : inconclusive ? null : true, verdict);
+
+    if (inconclusive) {
+      lines.push("");
+      lines.push("INCONCLUSIVE — the mic never opened, so the speech service was\n" +
+                 "never contacted. Fix microphone permission first (address-bar\n" +
+                 "padlock → Microphone → Allow), then run this again.");
+      out.innerHTML = lines.join("\n");
+    } else if (blocked) {
+      lines.push("");
+      lines.push(engine === "chrome" || engine === "edge"
+        ? "This build IS allowed to use Google's speech service, so the block is\n" +
+          "outside the browser: corporate proxy/VPN, DNS filtering, an extension\n" +
+          "(uBlock/Privacy Badger), or the network dropping the speech endpoint.\n" +
+          "Try: a different network (phone hotspot), an incognito window with\n" +
+          "extensions off, and VPN disabled."
+        : "This build is not Google Chrome or Edge, so the speech request is\n" +
+          "rejected regardless of network. Use Chrome or Edge.");
+      out.innerHTML = lines.join("\n");
+    } else {
+      lines.push("");
+      lines.push("Speech service is reachable here. If the main button still fails,\n" +
+                 "the concurrent waveform mic stream is the likely culprit — turn it\n" +
+                 "off with ?wave=0 on the URL and retry.");
+      out.innerHTML = lines.join("\n");
+    }
+  }
+}
+
+/* ------------------------------------------------------------------- util */
+function esc(s) {
+  return String(s).replace(/[&<>"']/g, (c) =>
+    ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+}
+function show(el, msg) { el.textContent = msg; el.classList.remove("hidden"); }
+function hide(el) { el.classList.add("hidden"); }
+
+/* ------------------------------------------------------------------- wire */
+$("mic").addEventListener("click", startListening);
+$("stop").addEventListener("click", () => { if (recog) recog.stop(); });
+$("diag").addEventListener("click", () => {
+  $("diag").disabled = true;
+  runDiagnostics().finally(() => { $("diag").disabled = false; });
+});
+$("send").addEventListener("click", () => {
+  const v = $("typed").value.trim();
+  if (v) { sttMs = null; $("transcript").textContent = v; ask(v); }
+});
+$("typed").addEventListener("keydown", (e) => { if (e.key === "Enter") $("send").click(); });
+$("replay").addEventListener("click", () => speak($("answer").textContent));
+
+EXAMPLES.forEach((q) => {
+  const b = document.createElement("button");
+  b.textContent = q;
+  b.addEventListener("click", () => { sttMs = null; $("transcript").textContent = q; ask(q); });
+  $("examples").appendChild(b);
+});
+
+/* Persistent engine readout. Voice support is decided entirely by which build
+   is running the page, so that fact is shown permanently rather than only
+   inside an error nobody reads until it is too late. */
+function renderEngineBadge() {
+  const e = speechEngine();
+  const ok = e === "chrome" || e === "edge";
+  const LABEL = {
+    chrome: "Google Chrome", edge: "Microsoft Edge",
+    "chromium-like": "Chromium / Electron shell", unknown: "unrecognised",
+  };
+  $("engineBadge").innerHTML =
+    '<span class="pill ' + (ok ? "good" : "bad") + '">' +
+      (ok ? "voice ready" : "voice unavailable") + "</span>" +
+    '<span class="msg">running in <b>' + esc(LABEL[e] || e) + "</b>" +
+      (ok ? "" : " — speech needs Google Chrome or Edge. If this is an " +
+                 "in-app/preview browser, open <b>http://localhost:7860</b> in " +
+                 "Chrome itself.") +
+    "</span>";
+}
+
+$("setupSave").addEventListener("click", () => saveSettings("local"));
+$("setupSession").addEventListener("click", () => saveSettings("session"));
+$("setupSkip").addEventListener("click", () => {
+  $("apiKey").value = "";
+  saveSettings("local");
+});
+$("setupClear").addEventListener("click", () => {
+  localStorage.removeItem(LS_KEY);
+  sessionStorage.removeItem(LS_KEY);
+  apiKey = "";
+  $("apiKey").value = "";
+  show($("setupMsg"), "Key cleared. Running in extractive mode.");
+  renderSetup(false);
+});
+
+loadSettings();
+$("apiKey").value = apiKey;
+$("apiBase").value = apiBase;
+// Collapse on return visits: the panel is a first-run prompt, not a checkpoint.
+renderSetup(!!localStorage.getItem("hhgoa.setupSeen"));
+
+initSpeech();
+idleWave();
+renderEngineBadge();
+waitForVoices();   // warm the voice list so the first answer can speak immediately
+</script>
+</body>
+</html>

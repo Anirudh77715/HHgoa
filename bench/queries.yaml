@@ -251,11 +251,17 @@
   expect: answer
   gold: [terms-00]
 
+# Reclassified from expect:answer. The notice board renders "Nothing pinned
+# yet" -- an empty UI state, not content. It is now excluded from the corpus
+# for the same reason /result is (volatile: true today, wrong the moment
+# something is pinned), and because as a 41-char doc it was measurably the
+# worst retrieval attractor in the index, taking rank 1 on 6/48 queries it had
+# nothing to do with. With it gone, this question has no grounded answer.
 - id: q038
   query: is anything pinned on the notice board
-  category: notice
-  expect: answer
-  gold: [notice-board-00]
+  category: volatile
+  expect: refuse
+  gold: []
 
 # --- must refuse: answer is genuinely absent from the corpus ---------------
 

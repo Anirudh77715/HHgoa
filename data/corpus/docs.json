@@ -1,16 +1,5 @@
 [
   {
-    "doc_id": "notice-board-00",
-    "url": "https://hhgoa.com/#notice-board",
-    "page": "/",
-    "section": "Notice Board",
-    "title": "Notice Board",
-    "text": "Pinned Up Notice Board Nothing pinned yet",
-    "kind": "notice",
-    "volatile": false,
-    "meta": {}
-  },
-  {
     "doc_id": "timeline-00",
     "url": "https://hhgoa.com/#timeline",
     "page": "/",

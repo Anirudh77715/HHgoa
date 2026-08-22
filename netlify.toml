@@ -1,0 +1,45 @@
+# Netlify hosts the FRONTEND ONLY.
+#
+# It cannot host the API, and it is worth being precise about why rather than
+# discovering it at deploy time:
+#
+#   * Netlify Functions run JavaScript/TypeScript and Go. This backend is
+#     Python (FastAPI + ONNX Runtime + FAISS). There is no Python runtime.
+#   * Even setting language aside, the bundle would carry onnxruntime,
+#     faiss-cpu, numpy and a ~130MB embedding model — far past the function
+#     size limit — and each cold start would reload the model, which is exactly
+#     the latency this project is measured on.
+#
+# So: static frontend here, API on a host that runs Python (Hugging Face
+# Spaces, Render, Fly, Railway). The frontend is built to be told where the API
+# lives — Setup panel, ?api= query param, or API_BASE below. See DEPLOY.md.
+
+[build]
+  publish = "app/static"
+  # No build step: index.html is self-contained, no bundler, no dependencies.
+  command = "bash netlify/inject-api-base.sh"
+
+[build.environment]
+  # Set this in Netlify → Site settings → Environment variables to the public
+  # URL of your API, e.g. https://<user>-ask-hh-goa.hf.space
+  # Leave unset and the page falls back to same-origin, then to whatever the
+  # visitor types into the Setup panel.
+  API_BASE = ""
+
+[[headers]]
+  for = "/*"
+  [headers.values]
+    # The page loads Google Fonts and talks to the configured API origin.
+    # connect-src stays permissive because the API host is chosen at deploy
+    # time (and by the visitor in the Setup panel), so it cannot be pinned here.
+    Content-Security-Policy = "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data:; connect-src *"
+    Referrer-Policy = "no-referrer"
+    X-Content-Type-Options = "nosniff"
+    X-Frame-Options = "DENY"
+    # Voice input needs an explicit grant for the mic in an embedded context.
+    Permissions-Policy = "microphone=(self)"
+
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200

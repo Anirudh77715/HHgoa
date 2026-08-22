@@ -5,30 +5,30 @@
       "strategy": "structural",
       "kind": "flat",
       "model": "BAAI/bge-small-en",
-      "n_vectors": 33,
+      "n_vectors": 32,
       "dim": 384,
-      "embed_total_ms": 5025.7,
-      "embed_per_chunk_ms": 152.29,
+      "embed_total_ms": 4737.7,
+      "embed_per_chunk_ms": 148.05,
       "path": "data\\index\\BAAI__bge-small-en\\flat\\structural"
     },
     {
       "strategy": "recursive",
       "kind": "flat",
       "model": "BAAI/bge-small-en",
-      "n_vectors": 55,
+      "n_vectors": 54,
       "dim": 384,
-      "embed_total_ms": 1462.0,
-      "embed_per_chunk_ms": 26.58,
+      "embed_total_ms": 1413.8,
+      "embed_per_chunk_ms": 26.18,
       "path": "data\\index\\BAAI__bge-small-en\\flat\\recursive"
     },
     {
       "strategy": "parent_child",
       "kind": "flat",
       "model": "BAAI/bge-small-en",
-      "n_vectors": 92,
+      "n_vectors": 91,
       "dim": 384,
-      "embed_total_ms": 1532.9,
-      "embed_per_chunk_ms": 16.66,
+      "embed_total_ms": 1503.8,
+      "embed_per_chunk_ms": 16.53,
       "path": "data\\index\\BAAI__bge-small-en\\flat\\parent_child"
     }
   ]

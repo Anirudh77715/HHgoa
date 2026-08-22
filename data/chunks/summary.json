@@ -1,55 +1,55 @@
 {
-  "n_docs": 33,
+  "n_docs": 32,
   "strategies": {
     "structural": {
-      "n_chunks": 33,
+      "n_chunks": 32,
       "embed_chars": {
-        "min": 41,
-        "median": 238,
-        "mean": 336.6,
+        "min": 95,
+        "median": 251,
+        "mean": 345.9,
         "max": 1808
       },
       "context_chars": {
-        "min": 41,
-        "median": 238,
-        "mean": 336.6,
+        "min": 95,
+        "median": 251,
+        "mean": 345.9,
         "max": 1808
       },
       "amplification": 1.0,
       "deduped": 0
     },
     "recursive": {
-      "n_chunks": 55,
+      "n_chunks": 54,
       "embed_chars": {
         "min": 20,
-        "median": 247,
-        "mean": 229.8,
+        "median": 249,
+        "mean": 233.3,
         "max": 411
       },
       "context_chars": {
         "min": 20,
-        "median": 247,
-        "mean": 229.8,
+        "median": 249,
+        "mean": 233.3,
         "max": 411
       },
       "amplification": 1.0,
       "deduped": 0
     },
     "parent_child": {
-      "n_chunks": 92,
+      "n_chunks": 91,
       "embed_chars": {
-        "min": 41,
-        "median": 162,
-        "mean": 164.9,
+        "min": 59,
+        "median": 165,
+        "mean": 166.3,
         "max": 309
       },
       "context_chars": {
-        "min": 41,
+        "min": 95,
         "median": 517,
-        "mean": 631.6,
+        "mean": 638.1,
         "max": 1808
       },
-      "amplification": 3.83,
+      "amplification": 3.84,
       "deduped": 0
     }
   }

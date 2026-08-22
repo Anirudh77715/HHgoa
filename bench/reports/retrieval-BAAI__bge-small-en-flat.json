@@ -10,40 +10,77 @@
     {
       "strategy": "structural",
       "kind": "flat",
-      "n_vectors": 33,
+      "n_vectors": 32,
       "n_calls": 2880,
-      "recall_at_k": 0.8947,
-      "hits": 34,
-      "answerable": 38,
+      "recall_at_k": 0.8919,
+      "precision_at_1": 0.6216,
+      "mrr_at_k": 0.7365,
+      "hits": 33,
+      "p1_hits": 23,
+      "answerable": 37,
       "recall_by_category": {
         "conflict": 1.0,
         "faq_direct": 1.0,
         "faq_paraphrase": 0.714,
-        "notice": 1.0,
         "task": 0.667,
         "terms": 1.0,
         "timeline_direct": 0.875,
         "timeline_multihop": 1.0
       },
+      "precision_at_1_by_category": {
+        "conflict": 0.0,
+        "faq_direct": 0.833,
+        "faq_paraphrase": 0.429,
+        "task": 0.667,
+        "terms": 0.727,
+        "timeline_direct": 0.625,
+        "timeline_multihop": 0.0
+      },
+      "attractors": [
+        {
+          "doc_id": "timeline-07",
+          "rank1_total": 6,
+          "rank1_not_gold": 5,
+          "share_of_queries": 0.104
+        },
+        {
+          "doc_id": "faq-02",
+          "rank1_total": 6,
+          "rank1_not_gold": 4,
+          "share_of_queries": 0.083
+        },
+        {
+          "doc_id": "timeline-08",
+          "rank1_total": 4,
+          "rank1_not_gold": 3,
+          "share_of_queries": 0.062
+        },
+        {
+          "doc_id": "timeline-01",
+          "rank1_total": 3,
+          "rank1_not_gold": 3,
+          "share_of_queries": 0.062
+        }
+      ],
       "latency_ms": {
         "embed": {
-          "50": 6.97,
-          "70": 7.27,
-          "100": 27.152
+          "50": 5.835,
+          "70": 6.151,
+          "100": 8.526
         },
         "search": {
-          "50": 0.097,
-          "70": 0.103,
-          "100": 0.726
+          "50": 0.067,
+          "70": 0.074,
+          "100": 0.293
         },
         "total": {
-          "50": 7.071,
-          "70": 7.377,
-          "100": 27.269
+          "50": 5.901,
+          "70": 6.225,
+          "100": 8.63
         },
-        "embed_mean": 7.058,
-        "search_mean": 0.101,
-        "total_mean": 7.159
+        "embed_mean": 5.888,
+        "search_mean": 0.07,
+        "total_mean": 5.958
       },
       "top_scores": {
         "q001": 0.8664610385894775,
@@ -52,16 +89,16 @@
         "q004": 0.8839414715766907,
         "q005": 0.8855770826339722,
         "q006": 0.9042752981185913,
-        "q007": 0.8577268123626709,
+        "q007": 0.8519136905670166,
         "q008": 0.9066611528396606,
         "q009": 0.8669217824935913,
-        "q010": 0.8394532203674316,
+        "q010": 0.8285713195800781,
         "q011": 0.9045988917350769,
         "q012": 0.8850979804992676,
         "q013": 0.8961347341537476,
         "q014": 0.9017655253410339,
         "q015": 0.8505777716636658,
-        "q016": 0.8088300228118896,
+        "q016": 0.8021994829177856,
         "q017": 0.869666337966919,
         "q018": 0.8440052270889282,
         "q019": 0.8378951549530029,
@@ -73,26 +110,26 @@
         "q025": 0.854302167892456,
         "q026": 0.832107663154602,
         "q027": 0.851226806640625,
-        "q028": 0.8524876832962036,
+        "q028": 0.8188074231147766,
         "q029": 0.8503968715667725,
         "q030": 0.8394678235054016,
         "q031": 0.8156313300132751,
-        "q032": 0.8157262206077576,
-        "q033": 0.8223230838775635,
+        "q032": 0.8048608303070068,
+        "q033": 0.7867526412010193,
         "q034": 0.8514240980148315,
-        "q035": 0.8379755020141602,
+        "q035": 0.8344042301177979,
         "q036": 0.899796187877655,
         "q037": 0.8857097625732422,
-        "q038": 0.9514299035072327,
+        "q038": 0.8028415441513062,
         "q039": 0.820897102355957,
-        "q040": 0.8156567811965942,
-        "q041": 0.7836361527442932,
-        "q042": 0.8008862733840942,
+        "q040": 0.8126404285430908,
+        "q041": 0.7730055451393127,
+        "q042": 0.7638964056968689,
         "q043": 0.8225883841514587,
         "q044": 0.8652796745300293,
-        "q045": 0.8268623352050781,
-        "q046": 0.8302160501480103,
-        "q047": 0.8159803152084351,
+        "q045": 0.8229709267616272,
+        "q046": 0.8235023021697998,
+        "q047": 0.7722771167755127,
         "q048": 0.8132280111312866
       },
       "detail": [
@@ -103,10 +140,12 @@
           "expect": "answer",
           "top_score": 0.8665,
           "hit": true,
+          "p1": false,
+          "rank": 2,
           "top_docs": [
             "timeline-08",
-            "notice-board-00",
-            "timeline-00"
+            "timeline-00",
+            "timeline-07"
           ]
         },
         {
@@ -116,10 +155,12 @@
           "expect": "answer",
           "top_score": 0.8884,
           "hit": true,
+          "p1": true,
+          "rank": 1,
           "top_docs": [
             "timeline-08",
-            "notice-board-00",
-            "timeline-07"
+            "timeline-07",
+            "timeline-00"
           ]
         },
         {
@@ -129,6 +170,8 @@
           "expect": "answer",
           "top_score": 0.8908,
           "hit": true,
+          "p1": true,
+          "rank": 1,
           "top_docs": [
             "timeline-09",
             "timeline-00",
@@ -142,6 +185,8 @@
           "expect": "answer",
           "top_score": 0.8839,
           "hit": true,
+          "p1": false,
+          "rank": 2,
           "top_docs": [
             "timeline-02",
             "timeline-01",
@@ -155,10 +200,12 @@
           "expect": "answer",
           "top_score": 0.8856,
           "hit": true,
+          "p1": true,
+          "rank": 1,
           "top_docs": [
             "timeline-02",
             "timeline-03",
-            "notice-board-00"
+            "timeline-05"
           ]
         },
         {
@@ -168,10 +215,12 @@
           "expect": "answer",
           "top_score": 0.9043,
           "hit": true,
+          "p1": true,
+          "rank": 1,
           "top_docs": [
             "timeline-07",
             "terms-03",
-            "notice-board-00"
+            "timeline-03"
           ]
         },
         {
@@ -179,12 +228,14 @@
           "query": "what dates is the hackathon",
           "category": "timeline_direct",
           "expect": "answer",
-          "top_score": 0.8577,
+          "top_score": 0.8519,
           "hit": false,
+          "p1": false,
+          "rank": 0,
           "top_docs": [
-            "notice-board-00",
             "timeline-01",
-            "timeline-07"
+            "timeline-07",
+            "faq-05"
           ]
         },
         {
@@ -194,6 +245,8 @@
           "expect": "answer",
           "top_score": 0.9067,
           "hit": true,
+          "p1": true,
+          "rank": 1,
           "top_docs": [
             "timeline-06",
             "timeline-01",
@@ -207,10 +260,12 @@
           "expect": "answer",
           "top_score": 0.8669,
           "hit": true,
+          "p1": false,
+          "rank": 3,
           "top_docs": [
             "timeline-03",
-            "notice-board-00",
-            "timeline-02"
+            "timeline-02",
+            "timeline-05"
           ]
         },
         {
@@ -218,12 +273,14 @@
           "query": "is there a registration fee",
           "category": "faq_direct",
           "expect": "answer",
-          "top_score": 0.8395,
+          "top_score": 0.8286,
           "hit": true,
+          "p1": false,
+          "rank": 2,
           "top_docs": [
-            "notice-board-00",
             "timeline-08",
-            "faq-03"
+            "faq-03",
+            "timeline-07"
           ]
         },
         {
@@ -233,6 +290,8 @@
           "expect": "answer",
           "top_score": 0.9046,
           "hit": true,
+          "p1": true,
+          "rank": 1,
           "top_docs": [
             "faq-00",
             "faq-03",
@@ -246,10 +305,12 @@
           "expect": "answer",
           "top_score": 0.8851,
           "hit": true,
+          "p1": true,
+          "rank": 1,
           "top_docs": [
             "faq-02",
-            "notice-board-00",
-            "timeline-07"
+            "timeline-07",
+            "faq-05"
           ]
         },
         {
@@ -259,6 +320,8 @@
           "expect": "answer",
           "top_score": 0.8961,
           "hit": true,
+          "p1": true,
+          "rank": 1,
           "top_docs": [
             "faq-04",
             "timeline-07",
@@ -272,10 +335,12 @@
           "expect": "answer",
           "top_score": 0.9018,
           "hit": true,
+          "p1": true,
+          "rank": 1,
           "top_docs": [
             "faq-05",
-            "notice-board-00",
-            "faq-02"
+            "faq-02",
+            "timeline-07"
           ]
         },
         {
@@ -285,6 +350,8 @@
           "expect": "answer",
           "top_score": 0.8506,
           "hit": true,
+          "p1": true,
+          "rank": 1,
           "top_docs": [
             "faq-01",
             "terms-10",
@@ -296,12 +363,14 @@
           "query": "do I have to pay anything to join",
           "category": "faq_paraphrase",
           "expect": "answer",
-          "top_score": 0.8088,
+          "top_score": 0.8022,
           "hit": true,
+          "p1": false,
+          "rank": 2,
           "top_docs": [
-            "notice-board-00",
             "timeline-07",
-            "faq-03"
+            "faq-03",
+            "terms-03"
           ]
         },
         {
@@ -311,10 +380,12 @@
           "expect": "answer",
           "top_score": 0.8697,
           "hit": true,
+          "p1": true,
+          "rank": 1,
           "top_docs": [
             "faq-05",
-            "notice-board-00",
-            "faq-02"
+            "faq-02",
+            "terms-09"
           ]
         },
         {
@@ -324,10 +395,12 @@
           "expect": "answer",
           "top_score": 0.844,
           "hit": true,
+          "p1": true,
+          "rank": 1,
           "top_docs": [
             "faq-02",
-            "notice-board-00",
-            "terms-07"
+            "terms-07",
+            "timeline-04"
           ]
         },
         {
@@ -337,10 +410,12 @@
           "expect": "answer",
           "top_score": 0.8379,
           "hit": true,
+          "p1": false,
+          "rank": 2,
           "top_docs": [
             "faq-05",
             "faq-00",
-            "notice-board-00"
+            "about-00"
           ]
         },
         {
@@ -350,10 +425,12 @@
           "expect": "answer",
           "top_score": 0.8177,
           "hit": true,
+          "p1": true,
+          "rank": 1,
           "top_docs": [
             "faq-04",
-            "notice-board-00",
-            "timeline-07"
+            "timeline-07",
+            "faq-01"
           ]
         },
         {
@@ -363,10 +440,12 @@
           "expect": "answer",
           "top_score": 0.8173,
           "hit": false,
+          "p1": false,
+          "rank": 0,
           "top_docs": [
             "terms-07",
-            "notice-board-00",
-            "faq-02"
+            "faq-02",
+            "terms-03"
           ]
         },
         {
@@ -376,6 +455,8 @@
           "expect": "answer",
           "top_score": 0.8113,
           "hit": false,
+          "p1": false,
+          "rank": 0,
           "top_docs": [
             "timeline-07",
             "faq-04",
@@ -389,6 +470,8 @@
           "expect": "answer",
           "top_score": 0.848,
           "hit": true,
+          "p1": true,
+          "rank": 1,
           "top_docs": [
             "terms-01",
             "timeline-07",
@@ -402,10 +485,12 @@
           "expect": "answer",
           "top_score": 0.8391,
           "hit": true,
+          "p1": true,
+          "rank": 1,
           "top_docs": [
             "terms-05",
-            "notice-board-00",
-            "faq-02"
+            "faq-02",
+            "timeline-03"
           ]
         },
         {
@@ -415,10 +500,12 @@
           "expect": "answer",
           "top_score": 0.8543,
           "hit": true,
+          "p1": true,
+          "rank": 1,
           "top_docs": [
             "terms-03",
             "timeline-07",
-            "notice-board-00"
+            "terms-10"
           ]
         },
         {
@@ -428,10 +515,12 @@
           "expect": "answer",
           "top_score": 0.8321,
           "hit": true,
+          "p1": true,
+          "rank": 1,
           "top_docs": [
             "terms-04",
-            "notice-board-00",
-            "terms-00"
+            "terms-00",
+            "terms-11"
           ]
         },
         {
@@ -441,10 +530,12 @@
           "expect": "answer",
           "top_score": 0.8512,
           "hit": true,
+          "p1": true,
+          "rank": 1,
           "top_docs": [
             "terms-11",
             "terms-10",
-            "notice-board-00"
+            "terms-07"
           ]
         },
         {
@@ -452,12 +543,14 @@
           "query": "how do I contact the organizers",
           "category": "terms",
           "expect": "answer",
-          "top_score": 0.8525,
+          "top_score": 0.8188,
           "hit": true,
+          "p1": false,
+          "rank": 3,
           "top_docs": [
-            "notice-board-00",
             "faq-02",
-            "timeline-07"
+            "timeline-07",
+            "terms-12"
           ]
         },
         {
@@ -467,10 +560,12 @@
           "expect": "answer",
           "top_score": 0.8504,
           "hit": true,
+          "p1": true,
+          "rank": 1,
           "top_docs": [
             "terms-10",
-            "notice-board-00",
-            "terms-03"
+            "terms-03",
+            "faq-05"
           ]
         },
         {
@@ -480,10 +575,12 @@
           "expect": "answer",
           "top_score": 0.8395,
           "hit": true,
+          "p1": true,
+          "rank": 1,
           "top_docs": [
             "terms-06",
             "faq-02",
-            "notice-board-00"
+            "tasks-00"
           ]
         },
         {
@@ -493,6 +590,8 @@
           "expect": "answer",
           "top_score": 0.8156,
           "hit": true,
+          "p1": true,
+          "rank": 1,
           "top_docs": [
             "terms-07",
             "terms-03",
@@ -504,12 +603,14 @@
           "query": "am I required to talk to sponsors",
           "category": "terms",
           "expect": "answer",
-          "top_score": 0.8157,
+          "top_score": 0.8049,
           "hit": true,
+          "p1": false,
+          "rank": 3,
           "top_docs": [
-            "notice-board-00",
             "faq-02",
-            "timeline-07"
+            "timeline-07",
+            "terms-08"
           ]
         },
         {
@@ -517,12 +618,14 @@
           "query": "what is task 2 about",
           "category": "task",
           "expect": "answer",
-          "top_score": 0.8223,
+          "top_score": 0.7868,
           "hit": false,
+          "p1": false,
+          "rank": 0,
           "top_docs": [
-            "notice-board-00",
             "faq-02",
-            "timeline-04"
+            "timeline-04",
+            "timeline-01"
           ]
         },
         {
@@ -532,10 +635,12 @@
           "expect": "answer",
           "top_score": 0.8514,
           "hit": true,
+          "p1": true,
+          "rank": 1,
           "top_docs": [
             "tasks-00",
-            "notice-board-00",
-            "timeline-01"
+            "timeline-01",
+            "faq-05"
           ]
         },
         {
@@ -543,12 +648,14 @@
           "query": "which hashtag do I use for the voice RAG task",
           "category": "task",
           "expect": "answer",
-          "top_score": 0.838,
+          "top_score": 0.8344,
           "hit": true,
+          "p1": true,
+          "rank": 1,
           "top_docs": [
-            "notice-board-00",
             "tasks-01",
-            "timeline-07"
+            "timeline-07",
+            "tasks-00"
           ]
         },
         {
@@ -558,6 +665,8 @@
           "expect": "answer",
           "top_score": 0.8998,
           "hit": true,
+          "p1": false,
+          "rank": 2,
           "top_docs": [
             "faq-00",
             "about-00",
@@ -571,6 +680,8 @@
           "expect": "answer",
           "top_score": 0.8857,
           "hit": true,
+          "p1": false,
+          "rank": 4,
           "top_docs": [
             "faq-00",
             "about-00",
@@ -580,14 +691,16 @@
         {
           "id": "q038",
           "query": "is anything pinned on the notice board",
-          "category": "notice",
-          "expect": "answer",
-          "top_score": 0.9514,
-          "hit": true,
+          "category": "volatile",
+          "expect": "refuse",
+          "top_score": 0.8028,
+          "hit": null,
+          "p1": null,
+          "rank": 0,
           "top_docs": [
-            "notice-board-00",
             "timeline-07",
-            "timeline-03"
+            "timeline-03",
+            "faq-02"
           ]
         },
         {
@@ -597,6 +710,8 @@
           "expect": "refuse",
           "top_score": 0.8209,
           "hit": null,
+          "p1": null,
+          "rank": 0,
           "top_docs": [
             "timeline-09",
             "timeline-00",
@@ -608,12 +723,14 @@
           "query": "write me a poem about hackathons",
           "category": "out_of_scope",
           "expect": "refuse",
-          "top_score": 0.8157,
+          "top_score": 0.8126,
           "hit": null,
+          "p1": null,
+          "rank": 0,
           "top_docs": [
-            "notice-board-00",
             "faq-05",
-            "timeline-01"
+            "timeline-01",
+            "faq-02"
           ]
         },
         {
@@ -621,12 +738,14 @@
           "query": "what is the capital of France",
           "category": "out_of_scope",
           "expect": "refuse",
-          "top_score": 0.7836,
+          "top_score": 0.773,
           "hit": null,
+          "p1": null,
+          "rank": 0,
           "top_docs": [
-            "notice-board-00",
             "timeline-07",
-            "faq-02"
+            "faq-02",
+            "timeline-04"
           ]
         },
         {
@@ -634,12 +753,14 @@
           "query": "how do I train a transformer from scratch",
           "category": "out_of_scope",
           "expect": "refuse",
-          "top_score": 0.8009,
+          "top_score": 0.7639,
           "hit": null,
+          "p1": null,
+          "rank": 0,
           "top_docs": [
-            "notice-board-00",
             "tasks-00",
-            "timeline-01"
+            "timeline-01",
+            "faq-02"
           ]
         },
         {
@@ -649,6 +770,8 @@
           "expect": "refuse",
           "top_score": 0.8226,
           "hit": null,
+          "p1": null,
+          "rank": 0,
           "top_docs": [
             "timeline-00",
             "terms-12",
@@ -662,6 +785,8 @@
           "expect": "refuse",
           "top_score": 0.8653,
           "hit": null,
+          "p1": null,
+          "rank": 0,
           "top_docs": [
             "timeline-08",
             "timeline-06",
@@ -673,12 +798,14 @@
           "query": "what was the total bounty pool",
           "category": "excluded_counter",
           "expect": "refuse",
-          "top_score": 0.8269,
+          "top_score": 0.823,
           "hit": null,
+          "p1": null,
+          "rank": 0,
           "top_docs": [
-            "notice-board-00",
             "timeline-01",
-            "timeline-07"
+            "timeline-07",
+            "timeline-02"
           ]
         },
         {
@@ -686,12 +813,14 @@
           "query": "who won the hackathon last year",
           "category": "excluded_volatile",
           "expect": "refuse",
-          "top_score": 0.8302,
+          "top_score": 0.8235,
           "hit": null,
+          "p1": null,
+          "rank": 0,
           "top_docs": [
-            "notice-board-00",
             "timeline-01",
-            "about-00"
+            "about-00",
+            "faq-00"
           ]
         },
         {
@@ -699,12 +828,14 @@
           "query": "what is the wifi password",
           "category": "adversarial_near_miss",
           "expect": "refuse",
-          "top_score": 0.816,
+          "top_score": 0.7723,
           "hit": null,
+          "p1": null,
+          "rank": 0,
           "top_docs": [
-            "notice-board-00",
             "faq-02",
-            "timeline-07"
+            "timeline-07",
+            "terms-12"
           ]
         },
         {
@@ -714,6 +845,8 @@
           "expect": "refuse",
           "top_score": 0.8132,
           "hit": null,
+          "p1": null,
+          "rank": 0,
           "top_docs": [
             "timeline-07",
             "timeline-01",
@@ -723,61 +856,98 @@
       ],
       "calibration": {
         "best": {
-          "threshold": 0.79,
-          "accuracy": 0.8125,
-          "answerable_kept": "38/38",
-          "refuse_blocked": "1/10"
+          "threshold": 0.78,
+          "accuracy": 0.8333,
+          "answerable_kept": "37/37",
+          "refuse_blocked": "3/11"
         },
         "answerable_scores": {
-          "min": 0.8088,
-          "p10": 0.8157,
-          "median": 0.852
+          "min": 0.7868,
+          "p10": 0.8113,
+          "median": 0.8512
         },
         "refuse_scores": {
-          "median": 0.8184,
-          "p90": 0.8653,
+          "median": 0.8132,
+          "p90": 0.8235,
           "max": 0.8653
         },
-        "separation_margin": -0.0564
+        "separation_margin": -0.0785
       }
     },
     {
       "strategy": "recursive",
       "kind": "flat",
-      "n_vectors": 55,
+      "n_vectors": 54,
       "n_calls": 2880,
-      "recall_at_k": 0.8684,
-      "hits": 33,
-      "answerable": 38,
+      "recall_at_k": 0.8649,
+      "precision_at_1": 0.5946,
+      "mrr_at_k": 0.7023,
+      "hits": 32,
+      "p1_hits": 22,
+      "answerable": 37,
       "recall_by_category": {
         "conflict": 1.0,
         "faq_direct": 1.0,
         "faq_paraphrase": 0.571,
-        "notice": 1.0,
         "task": 1.0,
         "terms": 0.909,
         "timeline_direct": 0.875,
         "timeline_multihop": 1.0
       },
+      "precision_at_1_by_category": {
+        "conflict": 0.0,
+        "faq_direct": 0.833,
+        "faq_paraphrase": 0.286,
+        "task": 0.667,
+        "terms": 0.727,
+        "timeline_direct": 0.625,
+        "timeline_multihop": 0.0
+      },
+      "attractors": [
+        {
+          "doc_id": "about-00",
+          "rank1_total": 6,
+          "rank1_not_gold": 6,
+          "share_of_queries": 0.125
+        },
+        {
+          "doc_id": "terms-08",
+          "rank1_total": 6,
+          "rank1_not_gold": 5,
+          "share_of_queries": 0.104
+        },
+        {
+          "doc_id": "tasks-01",
+          "rank1_total": 5,
+          "rank1_not_gold": 4,
+          "share_of_queries": 0.083
+        },
+        {
+          "doc_id": "timeline-08",
+          "rank1_total": 4,
+          "rank1_not_gold": 3,
+          "share_of_queries": 0.062
+        }
+      ],
       "latency_ms": {
         "embed": {
-          "50": 6.694,
-          "70": 7.017,
-          "100": 11.643
+          "50": 6.278,
+          "70": 6.648,
+          "100": 159.764
         },
         "search": {
-          "50": 0.099,
-          "70": 0.104,
-          "100": 0.41
+          "50": 0.078,
+          "70": 0.085,
+          "100": 1.321
         },
         "total": {
-          "50": 6.79,
-          "70": 7.12,
-          "100": 11.787
+          "50": 6.36,
+          "70": 6.732,
+          "100": 159.874
         },
-        "embed_mean": 6.763,
-        "search_mean": 0.101,
-        "total_mean": 6.864
+        "embed_mean": 6.529,
+        "search_mean": 0.082,
+        "total_mean": 6.61
       },
       "top_scores": {
         "q001": 0.8664610385894775,
@@ -786,10 +956,10 @@
         "q004": 0.8839414715766907,
         "q005": 0.8855770826339722,
         "q006": 0.9042752981185913,
-        "q007": 0.8577268123626709,
+        "q007": 0.8519136905670166,
         "q008": 0.9066611528396606,
         "q009": 0.8669217824935913,
-        "q010": 0.8394532203674316,
+        "q010": 0.8285713195800781,
         "q011": 0.9045988917350769,
         "q012": 0.8850979804992676,
         "q013": 0.8961347341537476,
@@ -807,26 +977,26 @@
         "q025": 0.8486163020133972,
         "q026": 0.8289679288864136,
         "q027": 0.867383599281311,
-        "q028": 0.8524876832962036,
+        "q028": 0.8469451665878296,
         "q029": 0.8503968715667725,
         "q030": 0.864794135093689,
         "q031": 0.8305712938308716,
         "q032": 0.911725640296936,
         "q033": 0.8249285221099854,
         "q034": 0.8400694131851196,
-        "q035": 0.8379755020141602,
+        "q035": 0.8313448429107666,
         "q036": 0.899796187877655,
         "q037": 0.8928274512290955,
-        "q038": 0.9514299035072327,
+        "q038": 0.8223744630813599,
         "q039": 0.8370217084884644,
         "q040": 0.8462759256362915,
-        "q041": 0.7836361527442932,
-        "q042": 0.8008862733840942,
+        "q041": 0.780916154384613,
+        "q042": 0.7854642868041992,
         "q043": 0.8341237902641296,
         "q044": 0.8652796745300293,
-        "q045": 0.8268623352050781,
-        "q046": 0.8302160501480103,
-        "q047": 0.8159803152084351,
+        "q045": 0.8229709267616272,
+        "q046": 0.8255876302719116,
+        "q047": 0.8079296946525574,
         "q048": 0.8203468322753906
       },
       "detail": [
@@ -837,10 +1007,12 @@
           "expect": "answer",
           "top_score": 0.8665,
           "hit": true,
+          "p1": false,
+          "rank": 2,
           "top_docs": [
             "timeline-08",
-            "notice-board-00",
-            "timeline-00"
+            "timeline-00",
+            "timeline-07"
           ]
         },
         {
@@ -850,10 +1022,12 @@
           "expect": "answer",
           "top_score": 0.8884,
           "hit": true,
+          "p1": true,
+          "rank": 1,
           "top_docs": [
             "timeline-08",
-            "notice-board-00",
-            "timeline-07"
+            "timeline-07",
+            "timeline-00"
           ]
         },
         {
@@ -863,6 +1037,8 @@
           "expect": "answer",
           "top_score": 0.8917,
           "hit": true,
+          "p1": true,
+          "rank": 1,
           "top_docs": [
             "terms-02",
             "timeline-09",
@@ -876,6 +1052,8 @@
           "expect": "answer",
           "top_score": 0.8839,
           "hit": true,
+          "p1": false,
+          "rank": 2,
           "top_docs": [
             "timeline-02",
             "timeline-01",
@@ -889,10 +1067,12 @@
           "expect": "answer",
           "top_score": 0.8856,
           "hit": true,
+          "p1": true,
+          "rank": 1,
           "top_docs": [
             "timeline-02",
             "timeline-03",
-            "notice-board-00"
+            "timeline-05"
           ]
         },
         {
@@ -902,10 +1082,12 @@
           "expect": "answer",
           "top_score": 0.9043,
           "hit": true,
+          "p1": true,
+          "rank": 1,
           "top_docs": [
             "timeline-07",
             "terms-03",
-            "notice-board-00"
+            "timeline-03"
           ]
         },
         {
@@ -913,12 +1095,14 @@
           "query": "what dates is the hackathon",
           "category": "timeline_direct",
           "expect": "answer",
-          "top_score": 0.8577,
+          "top_score": 0.8519,
           "hit": false,
+          "p1": false,
+          "rank": 0,
           "top_docs": [
-            "notice-board-00",
             "timeline-01",
-            "about-00"
+            "about-00",
+            "timeline-07"
           ]
         },
         {
@@ -928,6 +1112,8 @@
           "expect": "answer",
           "top_score": 0.9067,
           "hit": true,
+          "p1": true,
+          "rank": 1,
           "top_docs": [
             "timeline-06",
             "terms-08",
@@ -941,10 +1127,12 @@
           "expect": "answer",
           "top_score": 0.8669,
           "hit": true,
+          "p1": false,
+          "rank": 4,
           "top_docs": [
             "timeline-03",
-            "notice-board-00",
-            "timeline-02"
+            "timeline-02",
+            "terms-08"
           ]
         },
         {
@@ -952,12 +1140,14 @@
           "query": "is there a registration fee",
           "category": "faq_direct",
           "expect": "answer",
-          "top_score": 0.8395,
+          "top_score": 0.8286,
           "hit": true,
+          "p1": false,
+          "rank": 3,
           "top_docs": [
-            "notice-board-00",
             "timeline-08",
-            "terms-08"
+            "terms-08",
+            "faq-03"
           ]
         },
         {
@@ -967,6 +1157,8 @@
           "expect": "answer",
           "top_score": 0.9046,
           "hit": true,
+          "p1": true,
+          "rank": 1,
           "top_docs": [
             "faq-00",
             "about-00",
@@ -980,6 +1172,8 @@
           "expect": "answer",
           "top_score": 0.8851,
           "hit": true,
+          "p1": true,
+          "rank": 1,
           "top_docs": [
             "faq-02",
             "about-00",
@@ -993,6 +1187,8 @@
           "expect": "answer",
           "top_score": 0.8961,
           "hit": true,
+          "p1": true,
+          "rank": 1,
           "top_docs": [
             "faq-04",
             "about-00",
@@ -1006,6 +1202,8 @@
           "expect": "answer",
           "top_score": 0.9018,
           "hit": true,
+          "p1": true,
+          "rank": 1,
           "top_docs": [
             "faq-05",
             "about-00",
@@ -1019,6 +1217,8 @@
           "expect": "answer",
           "top_score": 0.8506,
           "hit": true,
+          "p1": true,
+          "rank": 1,
           "top_docs": [
             "faq-01",
             "terms-01",
@@ -1032,10 +1232,12 @@
           "expect": "answer",
           "top_score": 0.8244,
           "hit": false,
+          "p1": false,
+          "rank": 0,
           "top_docs": [
             "terms-08",
             "about-00",
-            "notice-board-00"
+            "terms-01"
           ]
         },
         {
@@ -1045,6 +1247,8 @@
           "expect": "answer",
           "top_score": 0.8697,
           "hit": true,
+          "p1": true,
+          "rank": 1,
           "top_docs": [
             "faq-05",
             "about-00",
@@ -1058,6 +1262,8 @@
           "expect": "answer",
           "top_score": 0.844,
           "hit": true,
+          "p1": true,
+          "rank": 1,
           "top_docs": [
             "faq-02",
             "terms-08",
@@ -1071,6 +1277,8 @@
           "expect": "answer",
           "top_score": 0.8379,
           "hit": true,
+          "p1": false,
+          "rank": 5,
           "top_docs": [
             "faq-05",
             "terms-08",
@@ -1084,6 +1292,8 @@
           "expect": "answer",
           "top_score": 0.8339,
           "hit": true,
+          "p1": false,
+          "rank": 2,
           "top_docs": [
             "about-00",
             "faq-04",
@@ -1097,6 +1307,8 @@
           "expect": "answer",
           "top_score": 0.8334,
           "hit": false,
+          "p1": false,
+          "rank": 0,
           "top_docs": [
             "terms-09",
             "terms-08",
@@ -1110,6 +1322,8 @@
           "expect": "answer",
           "top_score": 0.8249,
           "hit": false,
+          "p1": false,
+          "rank": 0,
           "top_docs": [
             "terms-08",
             "about-00",
@@ -1123,6 +1337,8 @@
           "expect": "answer",
           "top_score": 0.8643,
           "hit": true,
+          "p1": true,
+          "rank": 1,
           "top_docs": [
             "terms-01",
             "terms-08",
@@ -1136,6 +1352,8 @@
           "expect": "answer",
           "top_score": 0.8636,
           "hit": true,
+          "p1": true,
+          "rank": 1,
           "top_docs": [
             "terms-05",
             "terms-08",
@@ -1149,6 +1367,8 @@
           "expect": "answer",
           "top_score": 0.8486,
           "hit": true,
+          "p1": true,
+          "rank": 1,
           "top_docs": [
             "terms-03",
             "terms-03",
@@ -1162,10 +1382,12 @@
           "expect": "answer",
           "top_score": 0.829,
           "hit": true,
+          "p1": true,
+          "rank": 1,
           "top_docs": [
             "terms-04",
             "terms-09",
-            "notice-board-00"
+            "terms-08"
           ]
         },
         {
@@ -1175,6 +1397,8 @@
           "expect": "answer",
           "top_score": 0.8674,
           "hit": true,
+          "p1": false,
+          "rank": 2,
           "top_docs": [
             "terms-09",
             "terms-11",
@@ -1186,12 +1410,14 @@
           "query": "how do I contact the organizers",
           "category": "terms",
           "expect": "answer",
-          "top_score": 0.8525,
+          "top_score": 0.8469,
           "hit": false,
+          "p1": false,
+          "rank": 0,
           "top_docs": [
-            "notice-board-00",
             "terms-08",
-            "about-00"
+            "about-00",
+            "faq-02"
           ]
         },
         {
@@ -1201,6 +1427,8 @@
           "expect": "answer",
           "top_score": 0.8504,
           "hit": true,
+          "p1": true,
+          "rank": 1,
           "top_docs": [
             "terms-10",
             "terms-09",
@@ -1214,6 +1442,8 @@
           "expect": "answer",
           "top_score": 0.8648,
           "hit": true,
+          "p1": true,
+          "rank": 1,
           "top_docs": [
             "terms-06",
             "terms-06",
@@ -1227,6 +1457,8 @@
           "expect": "answer",
           "top_score": 0.8306,
           "hit": true,
+          "p1": true,
+          "rank": 1,
           "top_docs": [
             "terms-07",
             "terms-08",
@@ -1240,10 +1472,12 @@
           "expect": "answer",
           "top_score": 0.9117,
           "hit": true,
+          "p1": true,
+          "rank": 1,
           "top_docs": [
             "terms-08",
-            "notice-board-00",
-            "terms-01"
+            "terms-01",
+            "about-00"
           ]
         },
         {
@@ -1253,10 +1487,12 @@
           "expect": "answer",
           "top_score": 0.8249,
           "hit": true,
+          "p1": false,
+          "rank": 2,
           "top_docs": [
             "terms-08",
-            "notice-board-00",
-            "tasks-01"
+            "tasks-01",
+            "terms-06"
           ]
         },
         {
@@ -1266,6 +1502,8 @@
           "expect": "answer",
           "top_score": 0.8401,
           "hit": true,
+          "p1": true,
+          "rank": 1,
           "top_docs": [
             "tasks-00",
             "tasks-00",
@@ -1277,12 +1515,14 @@
           "query": "which hashtag do I use for the voice RAG task",
           "category": "task",
           "expect": "answer",
-          "top_score": 0.838,
+          "top_score": 0.8313,
           "hit": true,
+          "p1": true,
+          "rank": 1,
           "top_docs": [
-            "notice-board-00",
             "tasks-01",
-            "tasks-01"
+            "tasks-01",
+            "terms-08"
           ]
         },
         {
@@ -1292,6 +1532,8 @@
           "expect": "answer",
           "top_score": 0.8998,
           "hit": true,
+          "p1": false,
+          "rank": 2,
           "top_docs": [
             "faq-00",
             "about-00",
@@ -1305,6 +1547,8 @@
           "expect": "answer",
           "top_score": 0.8928,
           "hit": true,
+          "p1": false,
+          "rank": 5,
           "top_docs": [
             "about-00",
             "about-00",
@@ -1314,14 +1558,16 @@
         {
           "id": "q038",
           "query": "is anything pinned on the notice board",
-          "category": "notice",
-          "expect": "answer",
-          "top_score": 0.9514,
-          "hit": true,
+          "category": "volatile",
+          "expect": "refuse",
+          "top_score": 0.8224,
+          "hit": null,
+          "p1": null,
+          "rank": 0,
           "top_docs": [
-            "notice-board-00",
             "tasks-01",
-            "terms-08"
+            "terms-08",
+            "terms-09"
           ]
         },
         {
@@ -1331,6 +1577,8 @@
           "expect": "refuse",
           "top_score": 0.837,
           "hit": null,
+          "p1": null,
+          "rank": 0,
           "top_docs": [
             "about-00",
             "about-00",
@@ -1344,10 +1592,12 @@
           "expect": "refuse",
           "top_score": 0.8463,
           "hit": null,
+          "p1": null,
+          "rank": 0,
           "top_docs": [
             "tasks-01",
-            "notice-board-00",
-            "about-00"
+            "about-00",
+            "faq-05"
           ]
         },
         {
@@ -1355,12 +1605,14 @@
           "query": "what is the capital of France",
           "category": "out_of_scope",
           "expect": "refuse",
-          "top_score": 0.7836,
+          "top_score": 0.7809,
           "hit": null,
+          "p1": null,
+          "rank": 0,
           "top_docs": [
-            "notice-board-00",
             "about-00",
-            "about-00"
+            "about-00",
+            "tasks-01"
           ]
         },
         {
@@ -1368,12 +1620,14 @@
           "query": "how do I train a transformer from scratch",
           "category": "out_of_scope",
           "expect": "refuse",
-          "top_score": 0.8009,
+          "top_score": 0.7855,
           "hit": null,
+          "p1": null,
+          "rank": 0,
           "top_docs": [
-            "notice-board-00",
             "tasks-01",
-            "tasks-01"
+            "tasks-01",
+            "terms-08"
           ]
         },
         {
@@ -1383,6 +1637,8 @@
           "expect": "refuse",
           "top_score": 0.8341,
           "hit": null,
+          "p1": null,
+          "rank": 0,
           "top_docs": [
             "about-00",
             "timeline-00",
@@ -1396,6 +1652,8 @@
           "expect": "refuse",
           "top_score": 0.8653,
           "hit": null,
+          "p1": null,
+          "rank": 0,
           "top_docs": [
             "timeline-08",
             "timeline-06",
@@ -1407,12 +1665,14 @@
           "query": "what was the total bounty pool",
           "category": "excluded_counter",
           "expect": "refuse",
-          "top_score": 0.8269,
+          "top_score": 0.823,
           "hit": null,
+          "p1": null,
+          "rank": 0,
           "top_docs": [
-            "notice-board-00",
             "timeline-01",
-            "tasks-01"
+            "tasks-01",
+            "terms-09"
           ]
         },
         {
@@ -1420,12 +1680,14 @@
           "query": "who won the hackathon last year",
           "category": "excluded_volatile",
           "expect": "refuse",
-          "top_score": 0.8302,
+          "top_score": 0.8256,
           "hit": null,
+          "p1": null,
+          "rank": 0,
           "top_docs": [
-            "notice-board-00",
             "about-00",
-            "terms-08"
+            "terms-08",
+            "tasks-01"
           ]
         },
         {
@@ -1433,12 +1695,14 @@
           "query": "what is the wifi password",
           "category": "adversarial_near_miss",
           "expect": "refuse",
-          "top_score": 0.816,
+          "top_score": 0.8079,
           "hit": null,
+          "p1": null,
+          "rank": 0,
           "top_docs": [
-            "notice-board-00",
             "tasks-01",
-            "terms-08"
+            "terms-08",
+            "faq-02"
           ]
         },
         {
@@ -1448,6 +1712,8 @@
           "expect": "refuse",
           "top_score": 0.8203,
           "hit": null,
+          "p1": null,
+          "rank": 0,
           "top_docs": [
             "terms-08",
             "timeline-07",
@@ -1458,18 +1724,18 @@
       "calibration": {
         "best": {
           "threshold": 0.82,
-          "accuracy": 0.8542,
-          "answerable_kept": "38/38",
-          "refuse_blocked": "3/10"
+          "accuracy": 0.8333,
+          "answerable_kept": "37/37",
+          "refuse_blocked": "3/11"
         },
         "answerable_scores": {
           "min": 0.8244,
-          "p10": 0.829,
-          "median": 0.8646
+          "p10": 0.8286,
+          "median": 0.8643
         },
         "refuse_scores": {
-          "median": 0.8285,
-          "p90": 0.8653,
+          "median": 0.823,
+          "p90": 0.8463,
           "max": 0.8653
         },
         "separation_margin": -0.0409
@@ -1478,49 +1744,80 @@
     {
       "strategy": "parent_child",
       "kind": "flat",
-      "n_vectors": 92,
+      "n_vectors": 91,
       "n_calls": 2880,
-      "recall_at_k": 0.9211,
-      "hits": 35,
-      "answerable": 38,
+      "recall_at_k": 0.9189,
+      "precision_at_1": 0.6757,
+      "mrr_at_k": 0.7635,
+      "hits": 34,
+      "p1_hits": 25,
+      "answerable": 37,
       "recall_by_category": {
         "conflict": 1.0,
         "faq_direct": 1.0,
         "faq_paraphrase": 1.0,
-        "notice": 1.0,
         "task": 1.0,
         "terms": 0.818,
         "timeline_direct": 0.875,
         "timeline_multihop": 1.0
       },
+      "precision_at_1_by_category": {
+        "conflict": 0.0,
+        "faq_direct": 1.0,
+        "faq_paraphrase": 0.286,
+        "task": 1.0,
+        "terms": 0.818,
+        "timeline_direct": 0.625,
+        "timeline_multihop": 0.0
+      },
+      "attractors": [
+        {
+          "doc_id": "faq-02",
+          "rank1_total": 5,
+          "rank1_not_gold": 3,
+          "share_of_queries": 0.062
+        },
+        {
+          "doc_id": "faq-00",
+          "rank1_total": 4,
+          "rank1_not_gold": 3,
+          "share_of_queries": 0.062
+        },
+        {
+          "doc_id": "tasks-01",
+          "rank1_total": 5,
+          "rank1_not_gold": 3,
+          "share_of_queries": 0.062
+        }
+      ],
       "latency_ms": {
         "embed": {
-          "50": 6.898,
-          "70": 7.265,
-          "100": 44.389
+          "50": 5.885,
+          "70": 6.159,
+          "100": 10.514
         },
         "search": {
-          "50": 0.104,
-          "70": 0.109,
-          "100": 0.498
+          "50": 0.075,
+          "70": 0.081,
+          "100": 0.411
         },
         "total": {
-          "50": 7.008,
-          "70": 7.375,
-          "100": 44.503
+          "50": 5.961,
+          "70": 6.24,
+          "100": 10.627
         },
-        "embed_mean": 7.178,
-        "search_mean": 0.105,
-        "total_mean": 7.283
+        "embed_mean": 5.925,
+        "search_mean": 0.077,
+        "total_mean": 6.002
       },
       "top_scores": {
-        "q001": 0.8643407225608826,
+        "q001": 0.8615076541900635,
         "q002": 0.8807206153869629,
         "q003": 0.8933890461921692,
         "q004": 0.8882488012313843,
         "q005": 0.8901354670524597,
         "q006": 0.8988475203514099,
-        "q007": 0.8577268123626709,
+        "q007": 0.8454810976982117,
         "q008": 0.9084736108779907,
         "q009": 0.8732110857963562,
         "q010": 0.8605491518974304,
@@ -1541,7 +1838,7 @@
         "q025": 0.8606280088424683,
         "q026": 0.9294580817222595,
         "q027": 0.9048597812652588,
-        "q028": 0.8524876832962036,
+        "q028": 0.8400832414627075,
         "q029": 0.8524829745292664,
         "q030": 0.8653249740600586,
         "q031": 0.8428954482078552,
@@ -1551,16 +1848,16 @@
         "q035": 0.8844845294952393,
         "q036": 0.9093492031097412,
         "q037": 0.9120729565620422,
-        "q038": 0.9514299035072327,
+        "q038": 0.8128124475479126,
         "q039": 0.8341904878616333,
         "q040": 0.842035710811615,
-        "q041": 0.7836361527442932,
+        "q041": 0.7828229665756226,
         "q042": 0.8061328530311584,
         "q043": 0.8402540683746338,
         "q044": 0.8654561042785645,
-        "q045": 0.8268623352050781,
+        "q045": 0.8262588977813721,
         "q046": 0.8461341857910156,
-        "q047": 0.8159803152084351,
+        "q047": 0.7964123487472534,
         "q048": 0.8075888752937317
       },
       "detail": [
@@ -1569,12 +1866,14 @@
           "query": "when does registration begin",
           "category": "timeline_direct",
           "expect": "answer",
-          "top_score": 0.8643,
+          "top_score": 0.8615,
           "hit": true,
+          "p1": false,
+          "rank": 2,
           "top_docs": [
-            "notice-board-00",
             "timeline-08",
-            "timeline-00"
+            "timeline-00",
+            "timeline-07"
           ]
         },
         {
@@ -1584,10 +1883,12 @@
           "expect": "answer",
           "top_score": 0.8807,
           "hit": true,
+          "p1": true,
+          "rank": 1,
           "top_docs": [
             "timeline-08",
-            "notice-board-00",
-            "terms-00"
+            "terms-00",
+            "timeline-07"
           ]
         },
         {
@@ -1597,6 +1898,8 @@
           "expect": "answer",
           "top_score": 0.8934,
           "hit": true,
+          "p1": true,
+          "rank": 1,
           "top_docs": [
             "timeline-09",
             "timeline-00",
@@ -1610,6 +1913,8 @@
           "expect": "answer",
           "top_score": 0.8882,
           "hit": true,
+          "p1": true,
+          "rank": 1,
           "top_docs": [
             "timeline-01",
             "timeline-02",
@@ -1623,6 +1928,8 @@
           "expect": "answer",
           "top_score": 0.8901,
           "hit": true,
+          "p1": true,
+          "rank": 1,
           "top_docs": [
             "timeline-02",
             "timeline-03",
@@ -1636,6 +1943,8 @@
           "expect": "answer",
           "top_score": 0.8988,
           "hit": true,
+          "p1": true,
+          "rank": 1,
           "top_docs": [
             "timeline-07",
             "terms-03",
@@ -1647,12 +1956,14 @@
           "query": "what dates is the hackathon",
           "category": "timeline_direct",
           "expect": "answer",
-          "top_score": 0.8577,
+          "top_score": 0.8455,
           "hit": false,
+          "p1": false,
+          "rank": 0,
           "top_docs": [
-            "notice-board-00",
             "about-00",
-            "timeline-01"
+            "timeline-01",
+            "about-00"
           ]
         },
         {
@@ -1662,6 +1973,8 @@
           "expect": "answer",
           "top_score": 0.9085,
           "hit": true,
+          "p1": false,
+          "rank": 2,
           "top_docs": [
             "terms-02",
             "timeline-06",
@@ -1675,10 +1988,12 @@
           "expect": "answer",
           "top_score": 0.8732,
           "hit": true,
+          "p1": false,
+          "rank": 3,
           "top_docs": [
             "timeline-03",
-            "notice-board-00",
-            "timeline-02"
+            "timeline-02",
+            "terms-02"
           ]
         },
         {
@@ -1688,6 +2003,8 @@
           "expect": "answer",
           "top_score": 0.8605,
           "hit": true,
+          "p1": true,
+          "rank": 1,
           "top_docs": [
             "faq-03",
             "faq-03",
@@ -1701,6 +2018,8 @@
           "expect": "answer",
           "top_score": 0.934,
           "hit": true,
+          "p1": true,
+          "rank": 1,
           "top_docs": [
             "faq-00",
             "faq-00",
@@ -1714,10 +2033,12 @@
           "expect": "answer",
           "top_score": 0.9003,
           "hit": true,
+          "p1": true,
+          "rank": 1,
           "top_docs": [
             "faq-02",
             "faq-02",
-            "notice-board-00"
+            "faq-05"
           ]
         },
         {
@@ -1727,6 +2048,8 @@
           "expect": "answer",
           "top_score": 0.9034,
           "hit": true,
+          "p1": true,
+          "rank": 1,
           "top_docs": [
             "faq-04",
             "faq-04",
@@ -1740,10 +2063,12 @@
           "expect": "answer",
           "top_score": 0.9187,
           "hit": true,
+          "p1": true,
+          "rank": 1,
           "top_docs": [
             "faq-05",
             "faq-05",
-            "notice-board-00"
+            "faq-02"
           ]
         },
         {
@@ -1753,6 +2078,8 @@
           "expect": "answer",
           "top_score": 0.8823,
           "hit": true,
+          "p1": true,
+          "rank": 1,
           "top_docs": [
             "faq-01",
             "terms-02",
@@ -1766,6 +2093,8 @@
           "expect": "answer",
           "top_score": 0.8347,
           "hit": true,
+          "p1": false,
+          "rank": 3,
           "top_docs": [
             "terms-03",
             "terms-08",
@@ -1779,6 +2108,8 @@
           "expect": "answer",
           "top_score": 0.8654,
           "hit": true,
+          "p1": true,
+          "rank": 1,
           "top_docs": [
             "faq-05",
             "faq-05",
@@ -1792,6 +2123,8 @@
           "expect": "answer",
           "top_score": 0.8479,
           "hit": true,
+          "p1": true,
+          "rank": 1,
           "top_docs": [
             "faq-02",
             "faq-02",
@@ -1805,6 +2138,8 @@
           "expect": "answer",
           "top_score": 0.8497,
           "hit": true,
+          "p1": false,
+          "rank": 2,
           "top_docs": [
             "faq-05",
             "faq-00",
@@ -1818,6 +2153,8 @@
           "expect": "answer",
           "top_score": 0.8207,
           "hit": true,
+          "p1": false,
+          "rank": 4,
           "top_docs": [
             "about-00",
             "faq-00",
@@ -1831,6 +2168,8 @@
           "expect": "answer",
           "top_score": 0.8283,
           "hit": true,
+          "p1": false,
+          "rank": 4,
           "top_docs": [
             "terms-07",
             "faq-02",
@@ -1844,6 +2183,8 @@
           "expect": "answer",
           "top_score": 0.8259,
           "hit": true,
+          "p1": false,
+          "rank": 4,
           "top_docs": [
             "faq-04",
             "faq-04",
@@ -1857,6 +2198,8 @@
           "expect": "answer",
           "top_score": 0.8703,
           "hit": true,
+          "p1": true,
+          "rank": 1,
           "top_docs": [
             "terms-01",
             "terms-02",
@@ -1870,6 +2213,8 @@
           "expect": "answer",
           "top_score": 0.8756,
           "hit": true,
+          "p1": true,
+          "rank": 1,
           "top_docs": [
             "terms-05",
             "terms-05",
@@ -1883,6 +2228,8 @@
           "expect": "answer",
           "top_score": 0.8606,
           "hit": true,
+          "p1": true,
+          "rank": 1,
           "top_docs": [
             "terms-03",
             "terms-03",
@@ -1896,6 +2243,8 @@
           "expect": "answer",
           "top_score": 0.9295,
           "hit": true,
+          "p1": true,
+          "rank": 1,
           "top_docs": [
             "terms-04",
             "terms-04",
@@ -1909,6 +2258,8 @@
           "expect": "answer",
           "top_score": 0.9049,
           "hit": true,
+          "p1": true,
+          "rank": 1,
           "top_docs": [
             "terms-11",
             "terms-04",
@@ -1920,12 +2271,14 @@
           "query": "how do I contact the organizers",
           "category": "terms",
           "expect": "answer",
-          "top_score": 0.8525,
+          "top_score": 0.8401,
           "hit": false,
+          "p1": false,
+          "rank": 0,
           "top_docs": [
-            "notice-board-00",
             "faq-02",
-            "terms-04"
+            "terms-04",
+            "faq-02"
           ]
         },
         {
@@ -1935,6 +2288,8 @@
           "expect": "answer",
           "top_score": 0.8525,
           "hit": true,
+          "p1": true,
+          "rank": 1,
           "top_docs": [
             "terms-10",
             "terms-04",
@@ -1948,6 +2303,8 @@
           "expect": "answer",
           "top_score": 0.8653,
           "hit": true,
+          "p1": true,
+          "rank": 1,
           "top_docs": [
             "terms-06",
             "terms-06",
@@ -1961,6 +2318,8 @@
           "expect": "answer",
           "top_score": 0.8429,
           "hit": true,
+          "p1": true,
+          "rank": 1,
           "top_docs": [
             "terms-07",
             "terms-08",
@@ -1974,6 +2333,8 @@
           "expect": "answer",
           "top_score": 0.8947,
           "hit": true,
+          "p1": true,
+          "rank": 1,
           "top_docs": [
             "terms-08",
             "terms-08",
@@ -1987,6 +2348,8 @@
           "expect": "answer",
           "top_score": 0.8276,
           "hit": true,
+          "p1": true,
+          "rank": 1,
           "top_docs": [
             "tasks-01",
             "tasks-01",
@@ -2000,6 +2363,8 @@
           "expect": "answer",
           "top_score": 0.8891,
           "hit": true,
+          "p1": true,
+          "rank": 1,
           "top_docs": [
             "tasks-00",
             "tasks-00",
@@ -2013,6 +2378,8 @@
           "expect": "answer",
           "top_score": 0.8845,
           "hit": true,
+          "p1": true,
+          "rank": 1,
           "top_docs": [
             "tasks-01",
             "tasks-01",
@@ -2026,6 +2393,8 @@
           "expect": "answer",
           "top_score": 0.9093,
           "hit": true,
+          "p1": false,
+          "rank": 3,
           "top_docs": [
             "faq-00",
             "faq-00",
@@ -2039,6 +2408,8 @@
           "expect": "answer",
           "top_score": 0.9121,
           "hit": false,
+          "p1": false,
+          "rank": 0,
           "top_docs": [
             "faq-00",
             "faq-00",
@@ -2048,14 +2419,16 @@
         {
           "id": "q038",
           "query": "is anything pinned on the notice board",
-          "category": "notice",
-          "expect": "answer",
-          "top_score": 0.9514,
-          "hit": true,
+          "category": "volatile",
+          "expect": "refuse",
+          "top_score": 0.8128,
+          "hit": null,
+          "p1": null,
+          "rank": 0,
           "top_docs": [
-            "notice-board-00",
             "terms-04",
-            "terms-04"
+            "terms-04",
+            "tasks-01"
           ]
         },
         {
@@ -2065,6 +2438,8 @@
           "expect": "refuse",
           "top_score": 0.8342,
           "hit": null,
+          "p1": null,
+          "rank": 0,
           "top_docs": [
             "faq-03",
             "terms-07",
@@ -2078,10 +2453,12 @@
           "expect": "refuse",
           "top_score": 0.842,
           "hit": null,
+          "p1": null,
+          "rank": 0,
           "top_docs": [
             "tasks-01",
             "about-00",
-            "notice-board-00"
+            "faq-05"
           ]
         },
         {
@@ -2089,12 +2466,14 @@
           "query": "what is the capital of France",
           "category": "out_of_scope",
           "expect": "refuse",
-          "top_score": 0.7836,
+          "top_score": 0.7828,
           "hit": null,
+          "p1": null,
+          "rank": 0,
           "top_docs": [
-            "notice-board-00",
             "faq-02",
-            "faq-03"
+            "faq-03",
+            "timeline-07"
           ]
         },
         {
@@ -2104,10 +2483,12 @@
           "expect": "refuse",
           "top_score": 0.8061,
           "hit": null,
+          "p1": null,
+          "rank": 0,
           "top_docs": [
             "tasks-01",
             "tasks-01",
-            "notice-board-00"
+            "tasks-01"
           ]
         },
         {
@@ -2117,6 +2498,8 @@
           "expect": "refuse",
           "top_score": 0.8403,
           "hit": null,
+          "p1": null,
+          "rank": 0,
           "top_docs": [
             "faq-03",
             "terms-07",
@@ -2130,6 +2513,8 @@
           "expect": "refuse",
           "top_score": 0.8655,
           "hit": null,
+          "p1": null,
+          "rank": 0,
           "top_docs": [
             "timeline-08",
             "timeline-00",
@@ -2141,12 +2526,14 @@
           "query": "what was the total bounty pool",
           "category": "excluded_counter",
           "expect": "refuse",
-          "top_score": 0.8269,
+          "top_score": 0.8263,
           "hit": null,
+          "p1": null,
+          "rank": 0,
           "top_docs": [
-            "notice-board-00",
             "tasks-01",
-            "tasks-01"
+            "tasks-01",
+            "timeline-01"
           ]
         },
         {
@@ -2156,10 +2543,12 @@
           "expect": "refuse",
           "top_score": 0.8461,
           "hit": null,
+          "p1": null,
+          "rank": 0,
           "top_docs": [
             "faq-00",
             "faq-00",
-            "notice-board-00"
+            "about-00"
           ]
         },
         {
@@ -2167,12 +2556,14 @@
           "query": "what is the wifi password",
           "category": "adversarial_near_miss",
           "expect": "refuse",
-          "top_score": 0.816,
+          "top_score": 0.7964,
           "hit": null,
+          "p1": null,
+          "rank": 0,
           "top_docs": [
-            "notice-board-00",
             "faq-02",
-            "terms-04"
+            "terms-04",
+            "tasks-01"
           ]
         },
         {
@@ -2182,6 +2573,8 @@
           "expect": "refuse",
           "top_score": 0.8076,
           "hit": null,
+          "p1": null,
+          "rank": 0,
           "top_docs": [
             "terms-08",
             "faq-02",
@@ -2193,17 +2586,17 @@
         "best": {
           "threshold": 0.82,
           "accuracy": 0.875,
-          "answerable_kept": "38/38",
-          "refuse_blocked": "4/10"
+          "answerable_kept": "37/37",
+          "refuse_blocked": "5/11"
         },
         "answerable_scores": {
           "min": 0.8207,
           "p10": 0.8283,
-          "median": 0.8782
+          "median": 0.8756
         },
         "refuse_scores": {
-          "median": 0.8305,
-          "p90": 0.8655,
+          "median": 0.8263,
+          "p90": 0.8461,
           "max": 0.8655
         },
         "separation_margin": -0.0447

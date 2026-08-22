@@ -20,6 +20,9 @@ Findings from inspecting the live site (2026-08-22) that shape this module:
     Indexing it would produce answers that are stale the moment a rank drops,
     so it is excluded by default (`--include-volatile` to override).
 
+5.  Empty-state placeholders ("Nothing pinned yet") are volatile in the same
+    way, AND they poison ranking. See EMPTY_STATE_RE below for the measurement.
+
 Run:  py -m app.corpus.scrape
 """
 
@@ -59,10 +62,48 @@ EXCLUSIONS = [
         "what": "/result leaderboard ranks",
         "why": "Live reveal page; contents change as ranks are announced. Stale by design.",
     },
+    {
+        "what": "empty-state placeholders (e.g. the notice board's 'Nothing pinned yet')",
+        "why": (
+            "Volatile UI state rather than content, and measurably harmful in the "
+            "index: a 41-char chunk had the highest mean cosine of all 92 vectors "
+            "against control queries it shares no topic with, taking rank 1 on "
+            "6/48 benchmark queries. See EMPTY_STATE_RE."
+        ),
+    },
 ]
 
 # Text that signals a stats/counter block we must drop (finding #3).
 COUNTER_MARKERS = ("Registrations", "Bounties", "Inside HHG", "Past Editions")
+
+# Empty-state placeholders (finding #5). The notice board renders "Nothing
+# pinned yet" until an organiser posts something. Two independent reasons to
+# drop it, either of which would be sufficient:
+#
+#   volatile   It is a UI state, not content -- true today, wrong the moment
+#              something is pinned. Same category as /result.
+#
+#   attractor  MEASURED: as a 41-char chunk it had the HIGHEST mean cosine of
+#              all 92 vectors against six control queries about car tyres,
+#              cookies and Moby Dick -- content it shares nothing with. Short
+#              embed texts sit near the centroid of embedding space
+#              (corr(len, mean cosine) = -0.45 over the 48 benchmark queries,
+#              -0.51 over the controls), so they win rank 1 for whatever is
+#              asked. It took top-1 on 6/48 benchmark queries under
+#              parent_child and 13/48 under structural. recall@5 hid this
+#              completely; precision@1 in bench_retrieval.py now catches it.
+EMPTY_STATE_RE = re.compile(
+    r"\b(nothing\s+(pinned|posted|scheduled|here)\s+yet"
+    r"|no\s+(notices|updates|announcements|entries|posts)\b"
+    r"|coming\s+soon|stay\s+tuned|to\s+be\s+announced)\b",
+    re.I,
+)
+
+# A doc shorter than this carries too little signal to be a trustworthy
+# retrieval target, for the reason measured above. The shortest genuine doc on
+# the site is a 95-char timeline milestone, so this floor cannot reach real
+# content -- it only catches placeholders the pattern above missed.
+MIN_DOC_CHARS = 60
 
 BOILERPLATE = re.compile(
     r"^(check hype|apply|sound|←\s*hh goa|←\s*back to home|tap to reveal|"
@@ -471,6 +512,31 @@ def extract_generic(html: str, page: str) -> list[Doc]:
 # --------------------------------------------------------------------------
 
 
+def drop_placeholders(docs: list[Doc]) -> tuple[list[Doc], list[dict]]:
+    """Remove empty-state and sub-threshold docs, loudly.
+
+    Applied once over the whole corpus rather than inside each extractor, so a
+    new extractor cannot forget the rule. Every drop is printed and recorded in
+    the manifest: if the site ever pins a real notice, the doc stops matching
+    EMPTY_STATE_RE and returns to the index on the next scrape without anyone
+    editing this file.
+    """
+    kept: list[Doc] = []
+    dropped: list[dict] = []
+    for d in docs:
+        m = EMPTY_STATE_RE.search(d.text)
+        if m:
+            reason = f"empty-state placeholder ({m.group(0)!r})"
+        elif d.n_chars < MIN_DOC_CHARS:
+            reason = f"below MIN_DOC_CHARS ({d.n_chars} < {MIN_DOC_CHARS})"
+        else:
+            kept.append(d)
+            continue
+        print(f"  - dropped {d.doc_id}: {reason}")
+        dropped.append({"doc_id": d.doc_id, "reason": reason, "text": d.text})
+    return kept, dropped
+
+
 def build(include_volatile: bool = False) -> dict:
     docs: list[Doc] = []
     fetched: list[str] = []
@@ -499,6 +565,10 @@ def build(include_volatile: bool = False) -> dict:
     if not docs:
         raise RuntimeError("corpus build produced 0 docs — refusing to write an empty index")
 
+    docs, dropped = drop_placeholders(docs)
+    if not docs:
+        raise RuntimeError("all docs were dropped as placeholders — refusing to write")
+
     by_kind: dict[str, int] = {}
     for d in docs:
         by_kind[d.kind] = by_kind.get(d.kind, 0) + 1
@@ -510,6 +580,7 @@ def build(include_volatile: bool = False) -> dict:
         "n_chars": sum(d.n_chars for d in docs),
         "by_kind": by_kind,
         "exclusions": EXCLUSIONS,
+        "dropped": dropped,
     }
 
     OUT_DIR.mkdir(parents=True, exist_ok=True)

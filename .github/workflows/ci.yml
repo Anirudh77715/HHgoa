@@ -37,6 +37,35 @@ jobs:
       - name: assert corpus invariants
         run: python -m app.corpus.verify
 
+  guardrails:
+    name: guardrail acceptance suite
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - run: pip install -r requirements.txt
+
+      # No GEMINI_API_KEY here, deliberately. check_groundedness is a pure
+      # function of (answer, contexts) and the retrieval path runs entirely
+      # locally, so the guardrail the whole design leans on is testable with
+      # no secrets and no quota. This is the payoff for keeping the guardrails
+      # deterministic instead of using an LLM judge.
+      - name: build chunks and index
+        run: |
+          python -m app.chunking.build
+          python -m app.index.build --model "BAAI/bge-small-en"
+
+      # Exits non-zero only on UNDOCUMENTED failures. The known blind spots in
+      # bench/guardrail_cases.yaml are expected and do not fail the run; a new
+      # one does.
+      - name: guardrail acceptance cases
+        run: python -m bench.bench_guardrails --verbose
+
   image:
     name: docker image builds
     runs-on: ubuntu-latest

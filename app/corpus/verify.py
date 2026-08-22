@@ -19,6 +19,8 @@ import sys
 from collections import Counter
 from pathlib import Path
 
+from app.corpus.scrape import EMPTY_STATE_RE, MIN_DOC_CHARS
+
 DOCS = Path("data/corpus/docs.json")
 
 MIN_DOCS = 25
@@ -85,13 +87,32 @@ def main() -> int:
     vol = [d["doc_id"] for d in docs if d.get("volatile")]
     check(not vol, f"no volatile docs indexed ({vol or 'none'})")
 
+    # Empty-state placeholders are volatile too, and they wreck ranking: a
+    # 41-char "Nothing pinned yet" doc took rank 1 on 6/48 benchmark queries
+    # because short texts sit near the embedding centroid. recall@5 could not
+    # see it; precision@1 can. Both the pattern and the length floor are
+    # enforced here so a re-scrape cannot quietly reintroduce one.
+    placeholders = [d["doc_id"] for d in docs if EMPTY_STATE_RE.search(d["text"])]
+    check(not placeholders, f"no empty-state placeholders indexed ({placeholders or 'none'})")
+
+    runts = [
+        f"{d['doc_id']}({len(d['text'])})" for d in docs if len(d["text"]) < MIN_DOC_CHARS
+    ]
+    check(not runts, f"every doc is at least {MIN_DOC_CHARS} chars ({runts or 'none'})")
+
     # --- warnings (not failures) ---
     for d in docs:
         if d.get("meta", {}).get("extraction"):
             warnings.append(f"{d['doc_id']} used fallback extraction: {d['meta']['extraction']}")
-    tiny = [d["doc_id"] for d in docs if len(d["text"]) < 40]
+    # Not a failure, but worth seeing: docs close to the floor are the next
+    # candidates to become attractors if the site trims their copy.
+    tiny = [
+        f"{d['doc_id']}({len(d['text'])})"
+        for d in docs
+        if MIN_DOC_CHARS <= len(d["text"]) < MIN_DOC_CHARS * 1.5
+    ]
     if tiny:
-        warnings.append(f"very short docs (weak retrieval targets): {tiny}")
+        warnings.append(f"docs near the {MIN_DOC_CHARS}-char floor (attractor risk): {tiny}")
 
     if warnings:
         print("\nwarnings:")

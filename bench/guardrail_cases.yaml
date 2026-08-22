@@ -1,0 +1,260 @@
+# Acceptance cases for the groundedness guardrail.
+#
+# WHY THIS FILE EXISTS
+# CONTEXT.md listed groundedness as "untested, blocked by the 401". That was
+# wrong: check_groundedness(answer, contexts) is a pure deterministic function.
+# Only the END-TO-END path needs a Gemini key. The guardrail itself can be held
+# to account right now, and being deterministic is exactly why -- the same
+# input always produces the same verdict, so this is a real test rather than a
+# sample of one model's mood.
+#
+# HOW TO READ IT
+#   expect: block   the guardrail MUST reject this answer
+#   expect: pass    the guardrail MUST allow it (grounded answers and refusals)
+#   known_limit     we already know the guardrail gets this case WRONG. It is
+#                   recorded so the blind spot stays visible and measured. The
+#                   runner reports these separately and does NOT count them as
+#                   passes. Anything failing WITHOUT this flag is a regression
+#                   and fails the run.
+#
+# The `answer` strings are written as a model plausibly would given the real
+# retrieved context -- including the wrong ones. Contexts are pulled live from
+# the current index at run time, so this file cannot drift away from the corpus
+# without the run going red.
+
+# ---------------------------------------------------------------------------
+# 1. Fabricated specifics over the 6 queries that leak past the score gate.
+#    These are the cases §4.2 says groundedness has to carry alone.
+# ---------------------------------------------------------------------------
+
+- id: g001
+  query: what is the weather like in Goa in October
+  answer: Goa in October is warm and humid, typically around 30 degrees with occasional rain.
+  expect: block
+  why: temperature and month appear in no passage; classic outside-knowledge answer
+
+- id: g002
+  query: how many registrations were there in 2024
+  answer: There were 12,000 registrations for Hacker House Goa in 2024.
+  expect: block
+  why: the exact fabrication the animated-counter exclusion exists to prevent
+
+- id: g003
+  query: what was the total bounty pool
+  answer: The total bounty pool was $50,000 across all partner tracks.
+  expect: block
+  why: invented money figure; counters are excluded from the corpus by design
+
+- id: g004
+  query: who won the hackathon last year
+  answer: Team Kernel Panic won the 2024 edition and took home 500000 rupees.
+  expect: block
+  why: invented winner and prize; /result is excluded as volatile
+
+- id: g005
+  query: book me a flight to Goa
+  answer: The nearest airport is Dabolim GOI, about 30 km from the venue.
+  expect: block
+  why: travel specifics absent from the corpus; terms-07 says travel is the participant's own problem
+
+- id: g006
+  query: how many registrations were there in 2024
+  answer: Registrations opened on 7 May 2026 and closed on 1 October 2026.
+  expect: pass
+  why: |
+    Every specific is real and traceable. It does not ANSWER the question, but
+    groundedness is not an answer-relevance check and must not pretend to be
+    one -- blocking this would be a false positive.
+
+# ---------------------------------------------------------------------------
+# 2. False-positive control. A guardrail that blocks everything scores 100% on
+#    section 1 and is worthless. These must pass.
+# ---------------------------------------------------------------------------
+
+- id: g010
+  query: when does registration begin
+  answer: Registration begins on 7 May 2026, when applications open.
+  expect: pass
+  why: correct and fully grounded in timeline-00
+
+- id: g011
+  query: is there a registration fee
+  answer: No. Participation in Hacker House Goa is completely free, and accommodation and meals are provided.
+  expect: pass
+  why: correct, grounded in faq-03, and contains no checkable specifics at all
+
+- id: g012
+  query: what is the weather like in Goa in October
+  answer: I don't have that in the Hacker House Goa event information I can see.
+  expect: pass
+  why: a refusal makes no claims; blocking it would make refusing impossible
+
+- id: g013
+  query: what was the total bounty pool
+  answer: That is not stated in the event information available to me.
+  expect: pass
+  why: hedge-word refusal, no specifics to ground
+
+- id: g014
+  query: when are partner trials
+  answer: Partner Trials run in September 2026, with selection based on each partner's requirements.
+  expect: pass
+  why: grounded in timeline-06; month token must resolve against the context
+
+# ---------------------------------------------------------------------------
+# 3. KNOWN LIMITS. Documented in guardrails.py: the check verifies specifics,
+#    not semantics. These are the failures we can prove it has. They are here
+#    so the number is honest and so nobody "discovers" them in a demo.
+# ---------------------------------------------------------------------------
+
+- id: g020
+  query: when does registration begin
+  answer: Registration begins on 1 October 2026.
+  expect: block
+  known_limit: true
+  why: |
+    THE COMPOSED FAILURE, now half-fixed. Dense retrieval ranked timeline-08
+    "Registration Ends - 1 October 2026" ABOVE timeline-00 "Registration Begins
+    - 7 May 2026" (the begin/end antonym bug, CONTEXT §8), so the model was
+    being SHOWN the wrong passage first and this answer was the likely output.
+
+    Hybrid retrieval (RRF + BM25, default since 2026-08-22) fixes the ranking:
+    timeline-00 is now rank 1. But this case still fails, and deliberately
+    stays here, because timeline-08 remains in the top 5 -- so every token in
+    this answer is still supported and groundedness still waves it through.
+    The guardrail blind spot is unchanged; only the probability of hitting it
+    dropped. Nothing verifies that "1 October" was attached to the right
+    milestone, and nothing will until a check reasons about semantics rather
+    than about which specifics appear somewhere in the context.
+
+- id: g021
+  query: what is the weather like in Goa in October
+  answer: The weather there is warm and humid at that time of year, so pack light clothing.
+  expect: block
+  known_limit: true
+  why: |
+    Pure prose fabrication. No number, month, amount or URL, so there is
+    nothing for the check to verify and it returns no_checkable_claims. The
+    guardrail is blind to any hallucination that avoids specifics.
+
+- id: g022
+  query: what is the wifi password
+  answer: The wifi password is HHGOA2026.
+  expect: block
+  known_limit: true
+  why: |
+    "HHGOA2026" has no word boundary before the digits, so NUMBER_RE does not
+    match it and the answer registers zero checkable tokens. Alphanumeric
+    secrets -- exactly the thing you would least want fabricated -- slip
+    through. (This query is blocked by the score gate today, so it is not a
+    live risk; it is a property of the check worth knowing.)
+
+# ---------------------------------------------------------------------------
+# 5. Vocabulary gate. `gate_expect` cases assert the query is STOPPED before
+#    generation; there is no answer to ground, so groundedness is not consulted.
+#
+#    Found by a real voice test: speaking romanised Hindi produced a transcript
+#    that sailed through scope and score and got a cited answer. Measured:
+#      asdf qwer zxcv hjkl      cosine 0.8317  -> ANSWERED (above the gate, and
+#                                                 above several real questions)
+#      romanised Hindi          cosine 0.83-0.85 -> ANSWERED
+#    An embedding always lands somewhere, so cosine cannot separate these.
+#    Lexical overlap can, and does so with no threshold to tune:
+#      all 48 eval queries   min term-hits 2
+#      nonsense/non-English      term-hits 0
+# ---------------------------------------------------------------------------
+
+- id: g040
+  query: asdf qwer zxcv hjkl
+  gate_expect: block
+  why: keyboard mash scored cosine 0.8317 — above the gate — and was answered
+
+- id: g041
+  query: tu pata hai na matlab kya bol raha hoon
+  gate_expect: block
+  why: romanised Hindi, no corpus vocabulary; scored 0.8377 and was answered
+
+- id: g042
+  query: qwertyuiop
+  gate_expect: block
+  why: single nonsense token, zero corpus overlap
+
+- id: g043
+  query: पंजीकरण कब शुरू होता है
+  gate_expect: block
+  why: |
+    "When does registration begin?" in Hindi — a question the corpus DOES
+    answer. Blocking is the CORRECT behaviour for an English-only index
+    (bge-small-en), and the refusal says so explicitly (NO_VOCAB_TEXT) rather
+    than answering with a confidently wrong English passage.
+
+    It must be stopped at the VOCABULARY gate, not the score gate. Devanagari
+    tokenizes to zero Latin terms, and an earlier `n_terms > 0` precondition let
+    that through — it only looked correct because this particular query also
+    happened to fall below the score threshold. This case pins the gate, not
+    just the outcome. The multilingual gap itself is a real product limitation,
+    recorded in CONTEXT §14.4.
+
+- id: g044
+  query: when does registration begin
+  gate_expect: pass
+  why: false-positive control — a real question must not be caught by this gate
+
+- id: g045
+  query: mujhe registration ke bare mein batao
+  gate_expect: pass
+  why: |
+    Romanised Hindi that DOES carry a corpus keyword ("registration"). Passing
+    is correct — the user is genuinely asking about corpus content, and the
+    gate is deliberately about zero overlap, not about language.
+
+# ---------------------------------------------------------------------------
+# 4. Regression cases for the substring-matching bug (fixed 2026-08-22).
+#    check_groundedness used to test `token in haystack`, so any fabricated
+#    number that happened to be a substring of a real one was judged supported.
+#    It now compares token SETS extracted identically from both sides. These
+#    cases exist so that cannot come back.
+# ---------------------------------------------------------------------------
+
+- id: g030
+  query: how many builders attend hacker house goa
+  answer: There will be 50 builders at the residency.
+  expect: block
+  why: |
+    "50" is a substring of "500 elite builders" in about-00. Under the old
+    substring test this fabrication was reported as `grounded`. Especially bad
+    here because builder counts are the corpus's known conflict point.
+
+- id: g031
+  query: when does registration begin
+  answer: Registration begins on 7 May 202.
+  expect: block
+  why: '"202" is a substring of "2026"; a truncated year used to pass as grounded'
+
+- id: g032
+  query: is there a registration fee
+  answer: The stake is 4 thousand rupees.
+  expect: block
+  known_limit: true
+  why: |
+    Tokenizer coverage gap, distinct from the substring bug and NOT fixed.
+    MONEY_RE wants the amount adjacent to the unit ("4k", "4 rupees"), so the
+    spelled-out "4 thousand rupees" matches nothing, and the bare "4" is
+    dropped by the len>1 filter that keeps "day 2" from being treated as a
+    claim. Zero checkable tokens, so the answer is waved through. Widening the
+    filter would flag ordinary prose, so this is accepted and recorded.
+
+- id: g023
+  query: how many builders attend hacker house goa
+  answer: The About page says 500 builders while the timeline and terms say 247 builders.
+  expect: pass
+  known_limit: true
+  why: |
+    THE CONFLICT-CITING ANSWER IS BLOCKED. §5 indexes the 500-vs-247
+    contradiction on purpose and the system prompt orders the model to report
+    both figures with sources. But retrieval returns faq-00, about-00, faq-01,
+    faq-03, terms-00 -- about-00 (500) is there, timeline-09 and terms-02 (247)
+    are NOT. So "247" is unsupported and groundedness refuses the one answer
+    the design actually wants. Incomplete retrieval turns a correct answer into
+    a false refusal, and the answer that DOES pass is the one that silently
+    picks 500 -- precisely the behaviour §5 set out to prevent.

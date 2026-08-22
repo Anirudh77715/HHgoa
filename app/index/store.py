@@ -49,6 +49,19 @@ class VectorStore:
     def __len__(self) -> int:
         return int(self.index.ntotal)
 
+    @property
+    def vectors(self) -> np.ndarray:
+        """All stored vectors as an (n, dim) matrix.
+
+        Hybrid retrieval needs a dense score for EVERY chunk, not just top-k,
+        because fusion has to rank the same candidate set that BM25 scored. At
+        this corpus size reconstructing is trivial, and `matrix @ q` is the
+        same exact inner-product scan IndexFlatIP performs internally.
+        """
+        if len(self) == 0:
+            return np.zeros((0, self.dim), dtype=np.float32)
+        return self.index.reconstruct_n(0, len(self))
+
     def add(self, vectors: np.ndarray, payloads: list[dict[str, Any]]) -> None:
         if len(vectors) != len(payloads):
             raise ValueError(f"vectors ({len(vectors)}) != payloads ({len(payloads)})")
