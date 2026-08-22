@@ -27,8 +27,19 @@ USER appuser
 # Pre-download the embedding model into the image. Without this, the first
 # request after every cold start pays a ~30s model download and the p100
 # latency number becomes meaningless.
-ENV FASTEMBED_CACHE_PATH=/app/.cache/fastembed
-RUN python -c "from fastembed import TextEmbedding; TextEmbedding('BAAI/bge-small-en-v1.5')"
+#
+# EMBED_MODEL is set FIRST and the bake reads it, so the model baked into the
+# image cannot drift from the one the app loads. It did drift: this line used
+# to hardcode `bge-small-en-v1.5` while the app defaults to `bge-small-en`, so
+# the image shipped the wrong weights AND still paid the download at runtime.
+#
+# The -v1.5 suffix matters enormously and is not cosmetic: fastembed ships that
+# variant int8-quantized, and it measured 152.70ms p50 against 6.73ms for this
+# one on the same machine -- 23x slower, from unfused quantize/dequantize
+# nodes. See CONTEXT.md §4.1. Do not "upgrade" this to v1.5.
+ENV EMBED_MODEL=BAAI/bge-small-en \
+    FASTEMBED_CACHE_PATH=/app/.cache/fastembed
+RUN python -c "import os; from fastembed import TextEmbedding; TextEmbedding(os.environ['EMBED_MODEL'])"
 
 ENV PORT=7860 \
     PYTHONUNBUFFERED=1 \

@@ -1,3 +1,19 @@
+---
+title: Ask HH Goa
+emoji: 🎙️
+colorFrom: green
+colorTo: yellow
+sdk: docker
+app_port: 7860
+pinned: false
+license: mit
+---
+
+<!-- The YAML block above is required by Hugging Face Spaces: without it a
+     Docker Space refuses to build. GitHub renders it as a small table, which
+     is a fair price for "push the same repo to either host and it just works".
+     app_port must match the Dockerfile's EXPOSE/uvicorn port. -->
+
 # Ask HH Goa — voice-enabled RAG
 
 **Hacker House Goa 2026 · Task #2 · `#RAGInGoa`**
