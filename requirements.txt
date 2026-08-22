@@ -1,0 +1,27 @@
+# Runtime deps for the deployed app (kept deliberately light).
+#
+# NOTE: we use `fastembed` (ONNX Runtime) instead of `sentence-transformers`
+# (PyTorch). Same BAAI/bge-small-en-v1.5 weights, but no torch dependency:
+# ~50MB instead of ~2GB, and measurably faster CPU inference. On a free
+# 2-vCPU host that difference is the whole latency budget.
+
+fastapi>=0.115
+uvicorn[standard]>=0.32
+pydantic>=2.9
+python-dotenv>=1.0
+
+# embeddings (local, ONNX, no torch)
+fastembed>=0.4
+
+# vector search (local, in-process)
+faiss-cpu>=1.9
+numpy>=1.26
+
+# generation
+google-genai>=0.8
+
+# corpus build
+httpx>=0.27
+beautifulsoup4>=4.12
+lxml>=5.3
+pyyaml>=6.0

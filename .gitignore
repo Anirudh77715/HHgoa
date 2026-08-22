@@ -1,0 +1,44 @@
+# --- secrets: never commit ---
+.env
+.env.*
+!.env.example
+*.key
+secrets.json
+
+# --- python ---
+__pycache__/
+*.py[cod]
+*.so
+.venv/
+venv/
+env/
+*.egg-info/
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+
+# --- models / caches (large, re-downloadable) ---
+.cache/
+models/
+*.onnx
+*.bin
+*.safetensors
+
+# --- build artifacts ---
+data/index/*.faiss
+data/index/*.pkl
+
+# --- benchmark outputs (keep committed reports, drop raw runs) ---
+bench/runs/
+!bench/reports/
+
+# --- audio fixtures (large binaries; see bench/README.md) ---
+bench/audio/*.wav
+bench/audio/*.webm
+
+# --- os / editor ---
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+*.swp

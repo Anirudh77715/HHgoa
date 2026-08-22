@@ -1,0 +1,13 @@
+# Benchmark-only deps. NOT installed in the deployed image.
+#
+# The live app does speech-to-text in the browser (Web Speech API), so the
+# server needs no STT model. But a browser API is non-deterministic and
+# un-scriptable, which makes it useless for a reproducible benchmark.
+# faster-whisper gives us the same transcription step over fixed .wav
+# fixtures, so P50/P70/P100 numbers are replayable instead of hand-timed.
+
+-r requirements.txt
+
+faster-whisper>=1.1
+tabulate>=0.9
+matplotlib>=3.9

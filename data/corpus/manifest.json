@@ -1,0 +1,26 @@
+{
+  "source": "https://hhgoa.com",
+  "pages_fetched": [
+    "/",
+    "/terms"
+  ],
+  "n_docs": 32,
+  "n_chars": 9301,
+  "by_kind": {
+    "notice": 1,
+    "timeline": 10,
+    "task": 2,
+    "faq": 6,
+    "terms": 13
+  },
+  "exclusions": [
+    {
+      "what": "hero stat counters (Registrations 2024, Projects, Hackers, Bounties 2026)",
+      "why": "Values are animated from 0 by client-side JS and are absent from the server HTML. Indexing them would ground answers in a literal '0'. Excluded so these queries are refused instead of answered wrongly."
+    },
+    {
+      "what": "/result leaderboard ranks",
+      "why": "Live reveal page; contents change as ranks are announced. Stale by design."
+    }
+  ]
+}
