@@ -22,6 +22,13 @@ RUN pip install --no-cache-dir -r requirements.txt
 COPY --chown=appuser:appuser app/ ./app/
 COPY --chown=appuser:appuser data/ ./data/
 
+# /app itself was created by WORKDIR and is owned by ROOT -- COPY --chown only
+# sets ownership on the files it copies, not on the directory holding them. So
+# after USER appuser the model bake below could not create /app/.cache and the
+# build failed with permission denied. Create the cache dir and hand the whole
+# tree over before dropping privileges.
+RUN mkdir -p /app/.cache/fastembed && chown -R appuser:appuser /app
+
 USER appuser
 
 # Pre-download the embedding model into the image. Without this, the first

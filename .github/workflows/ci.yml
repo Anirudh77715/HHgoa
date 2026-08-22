@@ -28,14 +28,33 @@ jobs:
 
       - run: pip install -r requirements.txt
 
-      # Rebuild from the live site and assert the invariants that protect
-      # against silent corpus corruption. These are the failures that would
-      # otherwise surface as confidently wrong answers at demo time.
-      - name: rebuild corpus from live site
-        run: python -m app.corpus.scrape
-
-      - name: assert corpus invariants
+      # Assert the invariants against the COMMITTED corpus first. This is the
+      # check that must never be allowed to fail: it is deterministic, needs no
+      # network, and it guards the failures that would otherwise surface as
+      # confidently wrong answers at demo time.
+      - name: assert corpus invariants (committed corpus)
         run: python -m app.corpus.verify
+
+      # Re-scrape the live site as a DRIFT CHECK, and deliberately do not let
+      # it fail the build. hhgoa.com is a third party: it can be down, or block
+      # GitHub's IP ranges, and neither is a defect in this repo. Letting that
+      # turn the build red trains everyone to ignore a red build, which costs
+      # more than the drift signal is worth.
+      - name: re-scrape live site (drift check, non-blocking)
+        id: rescrape
+        continue-on-error: true
+        run: |
+          python -m app.corpus.scrape
+          python -m app.corpus.verify
+          git diff --stat -- data/corpus/ || true
+
+      - name: report drift
+        if: steps.rescrape.outcome == 'failure'
+        run: |
+          echo "::warning::Live re-scrape or its invariants failed. Either hhgoa.com" \
+               "is unreachable from CI, or the site changed in a way the extractors" \
+               "do not handle. The committed corpus still passes, so the build is" \
+               "green -- but check this before relying on the corpus being current."
 
   guardrails:
     name: guardrail acceptance suite
