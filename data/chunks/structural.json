@@ -1,0 +1,452 @@
+[
+  {
+    "chunk_id": "st::notice-board-00",
+    "doc_id": "notice-board-00",
+    "strategy": "structural",
+    "embed_text": "Pinned Up Notice Board Nothing pinned yet",
+    "context_text": "Pinned Up Notice Board Nothing pinned yet",
+    "title": "Notice Board",
+    "url": "https://hhgoa.com/#notice-board",
+    "kind": "notice",
+    "meta": {
+      "n_parts": 1
+    }
+  },
+  {
+    "chunk_id": "st::timeline-00",
+    "doc_id": "timeline-00",
+    "strategy": "structural",
+    "embed_text": "Registration Begins — 7 May 2026\nApplications open — start your HH GOA journey.\nMilestone date: 7 May 2026.",
+    "context_text": "Registration Begins — 7 May 2026\nApplications open — start your HH GOA journey.\nMilestone date: 7 May 2026.",
+    "title": "Registration Begins",
+    "url": "https://hhgoa.com/#timeline",
+    "kind": "timeline",
+    "meta": {
+      "date": "7 May 2026",
+      "milestone": "Registration Begins",
+      "n_parts": 1
+    }
+  },
+  {
+    "chunk_id": "st::timeline-01",
+    "doc_id": "timeline-01",
+    "strategy": "structural",
+    "embed_text": "Open Trials — August 2026\nSkill-based challenges open to everyone.\nMilestone date: August 2026.",
+    "context_text": "Open Trials — August 2026\nSkill-based challenges open to everyone.\nMilestone date: August 2026.",
+    "title": "Open Trials",
+    "url": "https://hhgoa.com/#timeline",
+    "kind": "timeline",
+    "meta": {
+      "date": "August 2026",
+      "milestone": "Open Trials",
+      "n_parts": 1
+    }
+  },
+  {
+    "chunk_id": "st::timeline-02",
+    "doc_id": "timeline-02",
+    "strategy": "structural",
+    "embed_text": "Alpha Selections — Early Sept 2026\nFirst shortlist from Open Trials performance.\nMilestone date: Early Sept 2026.",
+    "context_text": "Alpha Selections — Early Sept 2026\nFirst shortlist from Open Trials performance.\nMilestone date: Early Sept 2026.",
+    "title": "Alpha Selections",
+    "url": "https://hhgoa.com/#timeline",
+    "kind": "timeline",
+    "meta": {
+      "date": "Early Sept 2026",
+      "milestone": "Alpha Selections",
+      "n_parts": 1
+    }
+  },
+  {
+    "chunk_id": "st::timeline-03",
+    "doc_id": "timeline-03",
+    "strategy": "structural",
+    "embed_text": "Beta Selections — Early Sept 2026\nDeeper technical & portfolio review.\nMilestone date: Early Sept 2026.",
+    "context_text": "Beta Selections — Early Sept 2026\nDeeper technical & portfolio review.\nMilestone date: Early Sept 2026.",
+    "title": "Beta Selections",
+    "url": "https://hhgoa.com/#timeline",
+    "kind": "timeline",
+    "meta": {
+      "date": "Early Sept 2026",
+      "milestone": "Beta Selections",
+      "n_parts": 1
+    }
+  },
+  {
+    "chunk_id": "st::timeline-04",
+    "doc_id": "timeline-04",
+    "strategy": "structural",
+    "embed_text": "Charlie Selections — Mid Sept 2026\nInterviews and team-fit assessment.\nMilestone date: Mid Sept 2026.",
+    "context_text": "Charlie Selections — Mid Sept 2026\nInterviews and team-fit assessment.\nMilestone date: Mid Sept 2026.",
+    "title": "Charlie Selections",
+    "url": "https://hhgoa.com/#timeline",
+    "kind": "timeline",
+    "meta": {
+      "date": "Mid Sept 2026",
+      "milestone": "Charlie Selections",
+      "n_parts": 1
+    }
+  },
+  {
+    "chunk_id": "st::timeline-05",
+    "doc_id": "timeline-05",
+    "strategy": "structural",
+    "embed_text": "Delta Selections — Mid Sept 2026\nFinal shortlist confirmed before partner matching.\nMilestone date: Mid Sept 2026.",
+    "context_text": "Delta Selections — Mid Sept 2026\nFinal shortlist confirmed before partner matching.\nMilestone date: Mid Sept 2026.",
+    "title": "Delta Selections",
+    "url": "https://hhgoa.com/#timeline",
+    "kind": "timeline",
+    "meta": {
+      "date": "Mid Sept 2026",
+      "milestone": "Delta Selections",
+      "n_parts": 1
+    }
+  },
+  {
+    "chunk_id": "st::timeline-06",
+    "doc_id": "timeline-06",
+    "strategy": "structural",
+    "embed_text": "Partner Trials — September 2026\nSelection based on each partner's requirements and interests.\nMilestone date: September 2026.",
+    "context_text": "Partner Trials — September 2026\nSelection based on each partner's requirements and interests.\nMilestone date: September 2026.",
+    "title": "Partner Trials",
+    "url": "https://hhgoa.com/#timeline",
+    "kind": "timeline",
+    "meta": {
+      "date": "September 2026",
+      "milestone": "Partner Trials",
+      "n_parts": 1
+    }
+  },
+  {
+    "chunk_id": "st::timeline-07",
+    "doc_id": "timeline-07",
+    "strategy": "structural",
+    "embed_text": "RSVP & Stake — Late September\nFinal confirmation of your team's participation.\nMilestone date: Late September.",
+    "context_text": "RSVP & Stake — Late September\nFinal confirmation of your team's participation.\nMilestone date: Late September.",
+    "title": "RSVP & Stake",
+    "url": "https://hhgoa.com/#timeline",
+    "kind": "timeline",
+    "meta": {
+      "date": "Late September",
+      "milestone": "RSVP & Stake",
+      "n_parts": 1
+    }
+  },
+  {
+    "chunk_id": "st::timeline-08",
+    "doc_id": "timeline-08",
+    "strategy": "structural",
+    "embed_text": "Registration Ends — 1 October 2026\nLast day to register — no new entries accepted after this date.\nMilestone date: 1 October 2026.",
+    "context_text": "Registration Ends — 1 October 2026\nLast day to register — no new entries accepted after this date.\nMilestone date: 1 October 2026.",
+    "title": "Registration Ends",
+    "url": "https://hhgoa.com/#timeline",
+    "kind": "timeline",
+    "meta": {
+      "date": "1 October 2026",
+      "milestone": "Registration Ends",
+      "n_parts": 1
+    }
+  },
+  {
+    "chunk_id": "st::timeline-09",
+    "doc_id": "timeline-09",
+    "strategy": "structural",
+    "embed_text": "Residency — 28–31 October 2026\n247 builders come together to build, ship, and launch projects in Goa.\nMilestone date: 28–31 October 2026.",
+    "context_text": "Residency — 28–31 October 2026\n247 builders come together to build, ship, and launch projects in Goa.\nMilestone date: 28–31 October 2026.",
+    "title": "Residency",
+    "url": "https://hhgoa.com/#timeline",
+    "kind": "timeline",
+    "meta": {
+      "date": "28–31 October 2026",
+      "milestone": "Residency",
+      "n_parts": 1
+    }
+  },
+  {
+    "chunk_id": "st::tasks-00",
+    "doc_id": "tasks-00",
+    "strategy": "structural",
+    "embed_text": "HH Goa Frame / ID Card Generator\nDesign your own HH Goa 2026 themed photo frame generator. Use that same generator to bring your teammates into one combined frame. Post it on X with a quick how-to on generating your own #FrameInGoa post using your generator — and you're done.\n✦ Instantly recognizable HH Goa 2026 identity\n✦ 1-click download + 1-click Share to X\n✦ Works on any photo — no manual cropping\n✦ Personalized: name, stack, a generated builder class\n✦ Seconds from upload to shareable output\n✦ Get to the top of the ladder and win the exclusive HH Goa ID\n✦ Don't forget #FrameInGoa on every post\nTask #2",
+    "context_text": "HH Goa Frame / ID Card Generator\nDesign your own HH Goa 2026 themed photo frame generator. Use that same generator to bring your teammates into one combined frame. Post it on X with a quick how-to on generating your own #FrameInGoa post using your generator — and you're done.\n✦ Instantly recognizable HH Goa 2026 identity\n✦ 1-click download + 1-click Share to X\n✦ Works on any photo — no manual cropping\n✦ Personalized: name, stack, a generated builder class\n✦ Seconds from upload to shareable output\n✦ Get to the top of the ladder and win the exclusive HH Goa ID\n✦ Don't forget #FrameInGoa on every post\nTask #2",
+    "title": "HH Goa Frame / ID Card Generator",
+    "url": "https://hhgoa.com/#tasks",
+    "kind": "task",
+    "meta": {
+      "n_parts": 1
+    }
+  },
+  {
+    "chunk_id": "st::tasks-01",
+    "doc_id": "tasks-01",
+    "strategy": "structural",
+    "embed_text": "Voice-Enabled RAG Model\nSpeak a question, get a grounded answer. Build a full voice-to-answer RAG pipeline — transcription, engineered chunking, vector retrieval, and generation — wired together end to end, fast and guardrailed.\n✦ Speak the question — real voice-to-text input, not typed\n✦ Retrieval that's actually engineered — multiple chunking strategies, not one naive split\n✦ Blazing-fast — full pipeline under 200ms\n✦ P50 / P70 / P100 latency, benchmarked across real queries, not a lucky run\n✦ Runs inside a real harness — retries, structured I/O, error recovery\n✦ Guardrails that know when *not* to answer\n✦ Don't forget #RAGInGoa on every post",
+    "context_text": "Voice-Enabled RAG Model\nSpeak a question, get a grounded answer. Build a full voice-to-answer RAG pipeline — transcription, engineered chunking, vector retrieval, and generation — wired together end to end, fast and guardrailed.\n✦ Speak the question — real voice-to-text input, not typed\n✦ Retrieval that's actually engineered — multiple chunking strategies, not one naive split\n✦ Blazing-fast — full pipeline under 200ms\n✦ P50 / P70 / P100 latency, benchmarked across real queries, not a lucky run\n✦ Runs inside a real harness — retries, structured I/O, error recovery\n✦ Guardrails that know when *not* to answer\n✦ Don't forget #RAGInGoa on every post",
+    "title": "Voice-Enabled RAG Model",
+    "url": "https://hhgoa.com/#tasks",
+    "kind": "task",
+    "meta": {
+      "n_parts": 1
+    }
+  },
+  {
+    "chunk_id": "st::faq-00",
+    "doc_id": "faq-00",
+    "strategy": "structural",
+    "embed_text": "Q: Who can participate in Hacker House Goa?\nA: Anyone with a passion for building! Whether you're a developer, designer, product manager, or just someone with great ideas - you're welcome here. Teams of 1-3 people are encouraged, but solo participants are also accepted.",
+    "context_text": "Q: Who can participate in Hacker House Goa?\nA: Anyone with a passion for building! Whether you're a developer, designer, product manager, or just someone with great ideas - you're welcome here. Teams of 1-3 people are encouraged, but solo participants are also accepted.",
+    "title": "Who can participate in Hacker House Goa?",
+    "url": "https://hhgoa.com/#faq",
+    "kind": "faq",
+    "meta": {
+      "n_parts": 1
+    }
+  },
+  {
+    "chunk_id": "st::faq-01",
+    "doc_id": "faq-01",
+    "strategy": "structural",
+    "embed_text": "Q: How does the selection process work in Hacker House Goa?\nA: - First, your team has to attend the shortlisting tasks - Top teams from shortlisting tasks are waitlisted - Best teams from the Waitlisted groups are selected for attending Hacker House Goa in-person.",
+    "context_text": "Q: How does the selection process work in Hacker House Goa?\nA: - First, your team has to attend the shortlisting tasks - Top teams from shortlisting tasks are waitlisted - Best teams from the Waitlisted groups are selected for attending Hacker House Goa in-person.",
+    "title": "How does the selection process work in Hacker House Goa?",
+    "url": "https://hhgoa.com/#faq",
+    "kind": "faq",
+    "meta": {
+      "n_parts": 1
+    }
+  },
+  {
+    "chunk_id": "st::faq-02",
+    "doc_id": "faq-02",
+    "strategy": "structural",
+    "embed_text": "Q: What should I bring to the event?\nA: Bring your laptop, charger, any hardware you might need for your project, and your creative energy. We'll provide workspace, power outlets, WiFi, meals, and caffeine to keep you going.",
+    "context_text": "Q: What should I bring to the event?\nA: Bring your laptop, charger, any hardware you might need for your project, and your creative energy. We'll provide workspace, power outlets, WiFi, meals, and caffeine to keep you going.",
+    "title": "What should I bring to the event?",
+    "url": "https://hhgoa.com/#faq",
+    "kind": "faq",
+    "meta": {
+      "n_parts": 1
+    }
+  },
+  {
+    "chunk_id": "st::faq-03",
+    "doc_id": "faq-03",
+    "strategy": "structural",
+    "embed_text": "Q: Is there a registration fee?\nA: No! Participation in Hacker House Goa is completely free. We'll provide accommodation, meals, and all amenities during the 4-day event. You just need to get yourself to Goa!",
+    "context_text": "Q: Is there a registration fee?\nA: No! Participation in Hacker House Goa is completely free. We'll provide accommodation, meals, and all amenities during the 4-day event. You just need to get yourself to Goa!",
+    "title": "Is there a registration fee?",
+    "url": "https://hhgoa.com/#faq",
+    "kind": "faq",
+    "meta": {
+      "n_parts": 1
+    }
+  },
+  {
+    "chunk_id": "st::faq-04",
+    "doc_id": "faq-04",
+    "strategy": "structural",
+    "embed_text": "Q: How are teams formed?\nA: You can come with a pre-formed team or find teammates during our team formation session on Day 1. We'll have networking activities and a team matching board to help you find the perfect collaborators.",
+    "context_text": "Q: How are teams formed?\nA: You can come with a pre-formed team or find teammates during our team formation session on Day 1. We'll have networking activities and a team matching board to help you find the perfect collaborators.",
+    "title": "How are teams formed?",
+    "url": "https://hhgoa.com/#faq",
+    "kind": "faq",
+    "meta": {
+      "n_parts": 1
+    }
+  },
+  {
+    "chunk_id": "st::faq-05",
+    "doc_id": "faq-05",
+    "strategy": "structural",
+    "embed_text": "Q: Can I start working on my project before the event?\nA: You can brainstorm and plan, but all code must be written during the hackathon. Using existing libraries, APIs, and frameworks is encouraged - just don't bring pre-built solutions.",
+    "context_text": "Q: Can I start working on my project before the event?\nA: You can brainstorm and plan, but all code must be written during the hackathon. Using existing libraries, APIs, and frameworks is encouraged - just don't bring pre-built solutions.",
+    "title": "Can I start working on my project before the event?",
+    "url": "https://hhgoa.com/#faq",
+    "kind": "faq",
+    "meta": {
+      "n_parts": 1
+    }
+  },
+  {
+    "chunk_id": "st::about-00",
+    "doc_id": "about-00",
+    "strategy": "structural",
+    "embed_text": "About Hacker House Goa 2026\n4 days. one rhythm. everything intentional.\nWho can participate in Hacker House Goa?\nAnyone with a passion for building! Whether you're a developer, designer, product manager, or just someone with great ideas - you're welcome here. Teams of 1-3 people are encouraged, but solo participants are also accepted.\nHow does the selection process work in Hacker House Goa?\n- First, your team has to attend the shortlisting tasks - Top teams from shortlisting tasks are waitlisted - Best teams from the Waitlisted groups are selected for attending Hacker House Goa in-person.\nBring your laptop, charger, any hardware you might need for your project, and your creative energy. We'll provide workspace, power outlets, WiFi, meals, and caffeine to keep you going.\nNo! Participation in Hacker House Goa is completely free. We'll provide accommodation, meals, and all amenities during the 4-day event. You just need to get yourself to Goa!\nYou can come with a pre-formed team or find teammates during our team formation session on Day 1. We'll have networking activities and a team matching board to help you find the perfect collaborators.\nCan I start working on my project before the event?\nYou can brainstorm and plan, but all code must be written during the hackathon. Using existing libraries, APIs, and frameworks is encouraged - just don't bring pre-built solutions.\nMost hackathons are just hype and no substance. We're changing that. From October 28–31, we're taking over Goa for the country's biggest build-station.\nThis is for the developers who live in their terminals and ship things that matter. No fluff, no useless networking—just 500 elite builders, high-speed fiber, and the ocean at your doorstep. If you're ready to lock in and build your legacy, we'll see you on the sand.",
+    "context_text": "About Hacker House Goa 2026\n4 days. one rhythm. everything intentional.\nWho can participate in Hacker House Goa?\nAnyone with a passion for building! Whether you're a developer, designer, product manager, or just someone with great ideas - you're welcome here. Teams of 1-3 people are encouraged, but solo participants are also accepted.\nHow does the selection process work in Hacker House Goa?\n- First, your team has to attend the shortlisting tasks - Top teams from shortlisting tasks are waitlisted - Best teams from the Waitlisted groups are selected for attending Hacker House Goa in-person.\nBring your laptop, charger, any hardware you might need for your project, and your creative energy. We'll provide workspace, power outlets, WiFi, meals, and caffeine to keep you going.\nNo! Participation in Hacker House Goa is completely free. We'll provide accommodation, meals, and all amenities during the 4-day event. You just need to get yourself to Goa!\nYou can come with a pre-formed team or find teammates during our team formation session on Day 1. We'll have networking activities and a team matching board to help you find the perfect collaborators.\nCan I start working on my project before the event?\nYou can brainstorm and plan, but all code must be written during the hackathon. Using existing libraries, APIs, and frameworks is encouraged - just don't bring pre-built solutions.\nMost hackathons are just hype and no substance. We're changing that. From October 28–31, we're taking over Goa for the country's biggest build-station.\nThis is for the developers who live in their terminals and ship things that matter. No fluff, no useless networking—just 500 elite builders, high-speed fiber, and the ocean at your doorstep. If you're ready to lock in and build your legacy, we'll see you on the sand.",
+    "title": "About Hacker House Goa 2026",
+    "url": "https://hhgoa.com/",
+    "kind": "prose",
+    "meta": {
+      "note": "may conflict with timeline/terms on builder count",
+      "n_parts": 1
+    }
+  },
+  {
+    "chunk_id": "st::terms-00",
+    "doc_id": "terms-00",
+    "strategy": "structural",
+    "embed_text": "01 Acceptance of Terms\nHacker House Goa (“HH GOA,” “we,” “us”) is organized by 2:47 PM Studio. Registering for any stage of HH GOA 2026 — Open Trials, a Selections round, Partner Trials, or RSVP — means you accept these terms in full. If you don’t agree, please don’t register.",
+    "context_text": "01 Acceptance of Terms\nHacker House Goa (“HH GOA,” “we,” “us”) is organized by 2:47 PM Studio. Registering for any stage of HH GOA 2026 — Open Trials, a Selections round, Partner Trials, or RSVP — means you accept these terms in full. If you don’t agree, please don’t register.",
+    "title": "01 Acceptance of Terms",
+    "url": "https://hhgoa.com/terms",
+    "kind": "terms",
+    "meta": {
+      "n_parts": 1
+    }
+  },
+  {
+    "chunk_id": "st::terms-01",
+    "doc_id": "terms-01",
+    "strategy": "structural",
+    "embed_text": "02 Eligibility & Registration\nOpen Trials are open to everyone — students, professionals, and independent builders, anywhere in the world. You must be at least 18 years old at the time of the Residency, or have written consent from a parent/guardian plus an accompanying adult.\nEach stage in the selection funnel narrows the applicant pool. Advancing from one stage doesn’t guarantee advancement through the next — HH GOA and its partners make selection decisions at their sole discretion, based on the criteria published for that stage.",
+    "context_text": "02 Eligibility & Registration\nOpen Trials are open to everyone — students, professionals, and independent builders, anywhere in the world. You must be at least 18 years old at the time of the Residency, or have written consent from a parent/guardian plus an accompanying adult.\nEach stage in the selection funnel narrows the applicant pool. Advancing from one stage doesn’t guarantee advancement through the next — HH GOA and its partners make selection decisions at their sole discretion, based on the criteria published for that stage.",
+    "title": "02 Eligibility & Registration",
+    "url": "https://hhgoa.com/terms",
+    "kind": "terms",
+    "meta": {
+      "n_parts": 1
+    }
+  },
+  {
+    "chunk_id": "st::terms-02",
+    "doc_id": "terms-02",
+    "strategy": "structural",
+    "embed_text": "03 The Selection Process\nHH GOA 2026 runs a five-stage funnel before the Residency itself:\nOpen Trials — August 2026 — skill-based challenges, open to everyone.\nAlpha → Delta Selections — Sept 2026 — sequential shortlisting: performance review, technical deep-dive, and team-fit interviews.\nPartner Trials — September 2026 — matched against partner-specific requirements and interests.\nRSVP & Stake — Late September — final confirmation of your team's participation.\nResidency — 28–31 Oct 2026 — 247 builders on-site in Goa.\nFull dates and criteria for the current cycle are posted on the Timeline at a Glance section of the homepage, which supersedes any older schedule referenced elsewhere.",
+    "context_text": "03 The Selection Process\nHH GOA 2026 runs a five-stage funnel before the Residency itself:\nOpen Trials — August 2026 — skill-based challenges, open to everyone.\nAlpha → Delta Selections — Sept 2026 — sequential shortlisting: performance review, technical deep-dive, and team-fit interviews.\nPartner Trials — September 2026 — matched against partner-specific requirements and interests.\nRSVP & Stake — Late September — final confirmation of your team's participation.\nResidency — 28–31 Oct 2026 — 247 builders on-site in Goa.\nFull dates and criteria for the current cycle are posted on the Timeline at a Glance section of the homepage, which supersedes any older schedule referenced elsewhere.",
+    "title": "03 The Selection Process",
+    "url": "https://hhgoa.com/terms",
+    "kind": "terms",
+    "meta": {
+      "n_parts": 1
+    }
+  },
+  {
+    "chunk_id": "st::terms-03",
+    "doc_id": "terms-03",
+    "strategy": "structural",
+    "embed_text": "04 RSVP, Stake & Cancellations\nOnce your team clears Partner Trials, confirming your spot requires an RSVP and a refundable stake. The stake exists to hold a seat that would otherwise go to a waitlisted team — it is not a fee for participation.\nYour stake is refunded in full if HH GOA cancels or reschedules the Residency, or if you withdraw at least 14 days before 28 October 2026. Stakes are forfeited for no-shows or withdrawals inside that 14-day window, since a seat can no longer be reassigned at that point.\nRefunds are processed to the original payment method within 10 business days of approval. Contact us (see Contact, below) to request a withdrawal or refund.",
+    "context_text": "04 RSVP, Stake & Cancellations\nOnce your team clears Partner Trials, confirming your spot requires an RSVP and a refundable stake. The stake exists to hold a seat that would otherwise go to a waitlisted team — it is not a fee for participation.\nYour stake is refunded in full if HH GOA cancels or reschedules the Residency, or if you withdraw at least 14 days before 28 October 2026. Stakes are forfeited for no-shows or withdrawals inside that 14-day window, since a seat can no longer be reassigned at that point.\nRefunds are processed to the original payment method within 10 business days of approval. Contact us (see Contact, below) to request a withdrawal or refund.",
+    "title": "04 RSVP, Stake & Cancellations",
+    "url": "https://hhgoa.com/terms",
+    "kind": "terms",
+    "meta": {
+      "n_parts": 1
+    }
+  },
+  {
+    "chunk_id": "st::terms-04",
+    "doc_id": "terms-04",
+    "strategy": "structural",
+    "embed_text": "05 Code of Conduct\nHH GOA is a harassment-free environment for everyone, regardless of gender, gender identity, sexual orientation, disability, physical appearance, body size, race, or religion. We don’t tolerate harassment of participants, mentors, staff, or partners in any form.\nViolations may result in immediate removal from the Residency without refund of any stake, and exclusion from future HH GOA events. Report concerns to any on-site organizer or via the contact below — reports are handled confidentially.",
+    "context_text": "05 Code of Conduct\nHH GOA is a harassment-free environment for everyone, regardless of gender, gender identity, sexual orientation, disability, physical appearance, body size, race, or religion. We don’t tolerate harassment of participants, mentors, staff, or partners in any form.\nViolations may result in immediate removal from the Residency without refund of any stake, and exclusion from future HH GOA events. Report concerns to any on-site organizer or via the contact below — reports are handled confidentially.",
+    "title": "05 Code of Conduct",
+    "url": "https://hhgoa.com/terms",
+    "kind": "terms",
+    "meta": {
+      "n_parts": 1
+    }
+  },
+  {
+    "chunk_id": "st::terms-05",
+    "doc_id": "terms-05",
+    "strategy": "structural",
+    "embed_text": "06 Intellectual Property\nYou and your team retain full ownership of what you build during the Residency. Anything you bring with you — prior code, designs, or datasets — stays yours; you’re responsible for having the rights to use it.\nBy participating, you grant HH GOA a non-exclusive, royalty-free license to showcase your project (name, description, screenshots, demo links) in recaps, the website, and future promotional material. Bounty-specific IP terms, if any, are set by the sponsoring partner and disclosed before you opt in.",
+    "context_text": "06 Intellectual Property\nYou and your team retain full ownership of what you build during the Residency. Anything you bring with you — prior code, designs, or datasets — stays yours; you’re responsible for having the rights to use it.\nBy participating, you grant HH GOA a non-exclusive, royalty-free license to showcase your project (name, description, screenshots, demo links) in recaps, the website, and future promotional material. Bounty-specific IP terms, if any, are set by the sponsoring partner and disclosed before you opt in.",
+    "title": "06 Intellectual Property",
+    "url": "https://hhgoa.com/terms",
+    "kind": "terms",
+    "meta": {
+      "n_parts": 1
+    }
+  },
+  {
+    "chunk_id": "st::terms-06",
+    "doc_id": "terms-06",
+    "strategy": "structural",
+    "embed_text": "07 Media & Publicity\nPhotos and video are captured throughout the Residency for aftermovies, recaps, and future promotion. By attending, you consent to being filmed or photographed in shared spaces, and to that footage being used by HH GOA and 2:47 PM Studio without compensation. Let an organizer know on arrival if you’d like to opt out, and we’ll do our best to keep you out of published shots.",
+    "context_text": "07 Media & Publicity\nPhotos and video are captured throughout the Residency for aftermovies, recaps, and future promotion. By attending, you consent to being filmed or photographed in shared spaces, and to that footage being used by HH GOA and 2:47 PM Studio without compensation. Let an organizer know on arrival if you’d like to opt out, and we’ll do our best to keep you out of published shots.",
+    "title": "07 Media & Publicity",
+    "url": "https://hhgoa.com/terms",
+    "kind": "terms",
+    "meta": {
+      "n_parts": 1
+    }
+  },
+  {
+    "chunk_id": "st::terms-07",
+    "doc_id": "terms-07",
+    "strategy": "structural",
+    "embed_text": "08 Health, Safety & Travel\nYou’re responsible for your own travel arrangements, visas, travel insurance, and any medical needs during your stay in Goa. HH GOA provides the venue, meals during programming hours, and reasonable on-site duty of care, but isn’t a substitute for personal insurance.\nFollow venue safety guidance and local law at all times. HH GOA reserves the right to remove any participant whose conduct puts themselves or others at risk.",
+    "context_text": "08 Health, Safety & Travel\nYou’re responsible for your own travel arrangements, visas, travel insurance, and any medical needs during your stay in Goa. HH GOA provides the venue, meals during programming hours, and reasonable on-site duty of care, but isn’t a substitute for personal insurance.\nFollow venue safety guidance and local law at all times. HH GOA reserves the right to remove any participant whose conduct puts themselves or others at risk.",
+    "title": "08 Health, Safety & Travel",
+    "url": "https://hhgoa.com/terms",
+    "kind": "terms",
+    "meta": {
+      "n_parts": 1
+    }
+  },
+  {
+    "chunk_id": "st::terms-08",
+    "doc_id": "terms-08",
+    "strategy": "structural",
+    "embed_text": "09 Sponsor & Partner Interactions\nPartner Trials, bounties, and workshops may carry additional terms set by the sponsoring organization (for example, eligibility for a specific bounty prize, or usage terms for a partner API/SDK). Where partner terms and these Terms conflict on a partner-specific matter, the partner’s published terms govern that matter only.",
+    "context_text": "09 Sponsor & Partner Interactions\nPartner Trials, bounties, and workshops may carry additional terms set by the sponsoring organization (for example, eligibility for a specific bounty prize, or usage terms for a partner API/SDK). Where partner terms and these Terms conflict on a partner-specific matter, the partner’s published terms govern that matter only.",
+    "title": "09 Sponsor & Partner Interactions",
+    "url": "https://hhgoa.com/terms",
+    "kind": "terms",
+    "meta": {
+      "n_parts": 1
+    }
+  },
+  {
+    "chunk_id": "st::terms-09",
+    "doc_id": "terms-09",
+    "strategy": "structural",
+    "embed_text": "10 Limitation of Liability\nTo the fullest extent permitted by law, HH GOA, 2:47 PM Studio, and their organizers aren’t liable for indirect, incidental, or consequential damages arising from your participation, including loss of personal property, travel disruption, or project data loss. Nothing here limits liability for death, personal injury, or fraud caused by our negligence.",
+    "context_text": "10 Limitation of Liability\nTo the fullest extent permitted by law, HH GOA, 2:47 PM Studio, and their organizers aren’t liable for indirect, incidental, or consequential damages arising from your participation, including loss of personal property, travel disruption, or project data loss. Nothing here limits liability for death, personal injury, or fraud caused by our negligence.",
+    "title": "10 Limitation of Liability",
+    "url": "https://hhgoa.com/terms",
+    "kind": "terms",
+    "meta": {
+      "n_parts": 1
+    }
+  },
+  {
+    "chunk_id": "st::terms-10",
+    "doc_id": "terms-10",
+    "strategy": "structural",
+    "embed_text": "11 Changes to These Terms\nWe may update these Terms as the event details firm up — most recently for the 2026 selection funnel. Material changes will be reflected by a new effective date at the top of this page. Continued participation after a change means you accept the revised terms.",
+    "context_text": "11 Changes to These Terms\nWe may update these Terms as the event details firm up — most recently for the 2026 selection funnel. Material changes will be reflected by a new effective date at the top of this page. Continued participation after a change means you accept the revised terms.",
+    "title": "11 Changes to These Terms",
+    "url": "https://hhgoa.com/terms",
+    "kind": "terms",
+    "meta": {
+      "n_parts": 1
+    }
+  },
+  {
+    "chunk_id": "st::terms-11",
+    "doc_id": "terms-11",
+    "strategy": "structural",
+    "embed_text": "12 Governing Law\nThese Terms are governed by the laws of India. Any dispute arising from HH GOA 2026 is subject to the exclusive jurisdiction of the courts of Goa, India.",
+    "context_text": "12 Governing Law\nThese Terms are governed by the laws of India. Any dispute arising from HH GOA 2026 is subject to the exclusive jurisdiction of the courts of Goa, India.",
+    "title": "12 Governing Law",
+    "url": "https://hhgoa.com/terms",
+    "kind": "terms",
+    "meta": {
+      "n_parts": 1
+    }
+  },
+  {
+    "chunk_id": "st::terms-12",
+    "doc_id": "terms-12",
+    "strategy": "structural",
+    "embed_text": "13 Contact\nQuestions about these Terms, your stake, or a withdrawal request — reach us at satapathyprayasu@gmail.com .\n© 2026 HH-Goa. All rights reserved.",
+    "context_text": "13 Contact\nQuestions about these Terms, your stake, or a withdrawal request — reach us at satapathyprayasu@gmail.com .\n© 2026 HH-Goa. All rights reserved.",
+    "title": "13 Contact",
+    "url": "https://hhgoa.com/terms",
+    "kind": "terms",
+    "meta": {
+      "n_parts": 1
+    }
+  }
+]

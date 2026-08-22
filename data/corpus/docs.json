@@ -239,6 +239,19 @@
     "meta": {}
   },
   {
+    "doc_id": "about-00",
+    "url": "https://hhgoa.com/",
+    "page": "/",
+    "section": "About HH Goa",
+    "title": "About Hacker House Goa 2026",
+    "text": "About Hacker House Goa 2026\n4 days. one rhythm. everything intentional.\nWho can participate in Hacker House Goa?\nAnyone with a passion for building! Whether you're a developer, designer, product manager, or just someone with great ideas - you're welcome here. Teams of 1-3 people are encouraged, but solo participants are also accepted.\nHow does the selection process work in Hacker House Goa?\n- First, your team has to attend the shortlisting tasks - Top teams from shortlisting tasks are waitlisted - Best teams from the Waitlisted groups are selected for attending Hacker House Goa in-person.\nBring your laptop, charger, any hardware you might need for your project, and your creative energy. We'll provide workspace, power outlets, WiFi, meals, and caffeine to keep you going.\nNo! Participation in Hacker House Goa is completely free. We'll provide accommodation, meals, and all amenities during the 4-day event. You just need to get yourself to Goa!\nYou can come with a pre-formed team or find teammates during our team formation session on Day 1. We'll have networking activities and a team matching board to help you find the perfect collaborators.\nCan I start working on my project before the event?\nYou can brainstorm and plan, but all code must be written during the hackathon. Using existing libraries, APIs, and frameworks is encouraged - just don't bring pre-built solutions.\nMost hackathons are just hype and no substance. We're changing that. From October 28–31, we're taking over Goa for the country's biggest build-station.\nThis is for the developers who live in their terminals and ship things that matter. No fluff, no useless networking—just 500 elite builders, high-speed fiber, and the ocean at your doorstep. If you're ready to lock in and build your legacy, we'll see you on the sand.",
+    "kind": "prose",
+    "volatile": false,
+    "meta": {
+      "note": "may conflict with timeline/terms on builder count"
+    }
+  },
+  {
     "doc_id": "terms-00",
     "url": "https://hhgoa.com/terms",
     "page": "/terms",

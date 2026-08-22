@@ -1,0 +1,69 @@
+# This replaces local Docker entirely.
+#
+# The only real benefit of a local Docker install is catching Dockerfile
+# breakage fast. GitHub Actions does that on every push, free for public
+# repos, with no WSL2 and no reboots — and it verifies the build on clean
+# Linux rather than on one developer's machine, which is strictly better
+# evidence that the HF Spaces build will succeed.
+
+name: ci
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  corpus:
+    name: corpus builds and passes invariants
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - run: pip install -r requirements.txt
+
+      # Rebuild from the live site and assert the invariants that protect
+      # against silent corpus corruption. These are the failures that would
+      # otherwise surface as confidently wrong answers at demo time.
+      - name: rebuild corpus from live site
+        run: python -m app.corpus.scrape
+
+      - name: assert corpus invariants
+        run: python -m app.corpus.verify
+
+  image:
+    name: docker image builds
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: docker/setup-buildx-action@v3
+
+      # Build only — we never push. This is a compile check for the Dockerfile
+      # so a broken build is caught here instead of in an HF Spaces rebuild
+      # queue minutes before a deadline.
+      - uses: docker/build-push-action@v6
+        with:
+          context: .
+          push: false
+          load: true
+          tags: hh-goa-voice-rag:ci
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: container serves /healthz
+        run: |
+          docker run -d --name rag -p 7860:7860 hh-goa-voice-rag:ci
+          for i in $(seq 1 30); do
+            if curl -fsS http://localhost:7860/healthz; then echo "healthy"; exit 0; fi
+            sleep 2
+          done
+          echo "--- container did not become healthy; logs: ---"
+          docker logs rag
+          exit 1

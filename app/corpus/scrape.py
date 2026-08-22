@@ -328,6 +328,56 @@ def extract_timeline(soup: BeautifulSoup, page: str = "/") -> list[Doc]:
     return docs
 
 
+KNOWN_SECTION_IDS = ("notice-board", "timeline", "tasks", "check-hype")
+
+
+def extract_home_prose(soup: BeautifulSoup, page: str = "/") -> list[Doc]:
+    """Capture home-page prose that sits outside the semantic sections.
+
+    The "Less Noise. More Signal" pitch block belongs to no section id, so
+    section-based extraction silently dropped it. It is real site content and
+    it states "500 elite builders" — which CONFLICTS with the timeline and
+    terms, both of which say 247.
+
+    We index it anyway. A corpus where two sources disagree is a much better
+    test of whether the system cites its source instead of quietly picking a
+    winner, and the disagreement is genuinely in the site rather than staged.
+    """
+    root = soup.find("main") or soup.body
+    if root is None:
+        return []
+
+    parts: list[str] = []
+    for p in root.find_all(["p", "li"]):
+        if any(p.find_parent(id=sid) for sid in KNOWN_SECTION_IDS):
+            continue
+        if p.find_parent(attrs={"id": re.compile(r"^faq-panel-")}):
+            continue
+        t = clean(p.get_text(" "))
+        # Long-form only: short strings here are nav labels and counter labels.
+        if len(t) < 40 or _looks_like_counter(t) or BOILERPLATE.match(t):
+            continue
+        if t not in parts:
+            parts.append(t)
+
+    if not parts:
+        return []
+
+    body = "\n".join(parts)
+    return [
+        Doc(
+            doc_id="about-00",
+            url=f"{BASE}{page}",
+            page=page,
+            section="About HH Goa",
+            title="About Hacker House Goa 2026",
+            text=f"About Hacker House Goa 2026\n{body}",
+            kind="prose",
+            meta={"note": "may conflict with timeline/terms on builder count"},
+        )
+    ]
+
+
 def extract_home(html: str) -> list[Doc]:
     soup = soupify(html)
     docs: list[Doc] = []
@@ -335,6 +385,7 @@ def extract_home(html: str) -> list[Doc]:
     docs += extract_timeline(soup, "/")
     docs += extract_section(soup, "tasks", "task", "/")
     docs += extract_faqs(soup, "/")
+    docs += extract_home_prose(soup, "/")
     return docs
 
 
