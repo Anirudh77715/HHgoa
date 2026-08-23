@@ -25,6 +25,36 @@ So Netlify hosts the static page, and the page is told where the API lives.
 
 ---
 
+## Option 0 — no backend at all (lite mode)
+
+A static host with **no API** still works. The page loads a 37KB
+`corpus.json` and runs retrieval in the browser.
+
+Nothing to configure: if the startup probe finds no API, lite mode activates
+automatically and the banner says so.
+
+**What you give up, measured on the same 37-query eval set:**
+
+| | recall@5 | prec@1 | MRR |
+|---|---|---|---|
+| full hybrid (API) | 0.919 | 0.703 | 0.763 |
+| **lite (browser)** | **0.865** | **0.649** | **0.733** |
+
+Lite mode is **BM25 only** — a browser has no embedding model, so there are no
+dense vectors and no RRF fusion. The score gate is also skipped, because its
+threshold is a calibrated *cosine* and BM25 scores are on an unrelated scale.
+Scope filtering, the vocabulary gate, parent collapsing and citations are all
+unchanged.
+
+It exists so a frontend-only deploy degrades instead of dying. Use a real API
+for anything you want judged on latency or ranking quality.
+
+Regenerate the corpus after any chunking change:
+
+```bash
+py -m app.chunking.export_static
+```
+
 ## Option A — everything on one host (simplest)
 
 The API already serves the frontend at `/`. Nothing to configure.

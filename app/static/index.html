@@ -828,16 +828,20 @@ async function checkApi() {
     return h;
   } catch (e) {
     apiOk = false;
-    renderApiStatus(false,
-      `No API at ${target}. ` +
-      (apiBase
-        ? "The endpoint is set but unreachable — check it is running and that " +
-          "its ALLOWED_ORIGINS permits this site."
-        : "This page is hosted without a backend (Netlify serves the frontend " +
-          "only — it cannot run the Python API). Set the API endpoint below, " +
-          "or append ?api=https://your-api-host to this URL."));
-    // Force Setup open: there is nothing useful to do until this is resolved.
-    $("setupCard").classList.remove("done");
+    const lite = await liteLoad();
+    if (lite) {
+      renderApiStatus(false,
+        `No API at ${target} — running in LITE MODE, in your browser. ` +
+        "Retrieval, guardrails and citations all work; ranking is BM25-only " +
+        "(measured recall@5 0.865 vs 0.919 for the full hybrid pipeline) " +
+        "because a browser has no embedding model. Point this at a running " +
+        "API below for the full thing.");
+    } else {
+      renderApiStatus(false,
+        `No API at ${target}, and the offline corpus failed to load. ` +
+        "Set the API endpoint below, or append ?api=https://your-api-host.");
+      $("setupCard").classList.remove("done");
+    }
     return null;
   }
 }
@@ -903,6 +907,181 @@ function saveSettings(store) {
   checkApi();   // the endpoint may have just changed; re-verify against it
 }
 
+/* ====================================================================== LITE
+   Browser-only retrieval, used when no API is reachable.
+
+   A static host cannot run the Python service, so without this the page is
+   dead. Lite mode ports the pipeline into JS over a 37KB corpus.json.
+
+   HONEST ABOUT THE COST: the browser has no embedding model, so this is
+   **BM25 only** -- no dense vectors, no RRF fusion. Measured on the same
+   37-query set (bench/bench_hybrid.py):
+
+       hybrid (API)   recall@5 0.919   prec@1 0.703
+       bm25 only      recall@5 0.865   prec@1 0.649
+
+   A real downgrade, not a free lunch. Guardrails and citations are unaffected;
+   only ranking quality drops. The UI labels every lite answer as such.
+
+   The guardrail logic is duplicated from app/rag/guardrails.py, which is a
+   genuine drift risk. It is kept deliberately small and the thresholds are
+   read from the same numbers documented there. bench/bench_guardrails.py still
+   tests the Python side; this copy is not covered by it. Noted, not hidden. */
+const LITE = {
+  ready: false, chunks: [], parents: {}, df: {}, idf: {}, tf: [], dl: [], avgdl: 1,
+  k1: 1.5, b: 0.75,
+};
+
+function liteStem(w) {
+  for (const suf of ["ing", "es", "s"]) {
+    if (w.length > suf.length + 2 && w.endsWith(suf)) return w.slice(0, -suf.length);
+  }
+  return w;
+}
+function liteTokens(text) {
+  return (String(text).toLowerCase().match(/[a-z0-9]+/g) || []).map(liteStem);
+}
+
+async function liteLoad() {
+  if (LITE.ready) return true;
+  try {
+    const res = await fetch("corpus.json", { cache: "force-cache" });
+    if (!res.ok) throw new Error("HTTP " + res.status);
+    const data = await res.json();
+    LITE.chunks = data.chunks;
+    LITE.parents = data.parents;
+
+    LITE.tf = LITE.chunks.map((c) => {
+      const counts = Object.create(null);
+      for (const t of liteTokens(c.e)) counts[t] = (counts[t] || 0) + 1;
+      return counts;
+    });
+    LITE.dl = LITE.tf.map((m) => Object.values(m).reduce((a, b) => a + b, 0));
+    LITE.avgdl = LITE.dl.reduce((a, b) => a + b, 0) / (LITE.dl.length || 1);
+
+    const df = Object.create(null);
+    for (const m of LITE.tf) for (const t of Object.keys(m)) df[t] = (df[t] || 0) + 1;
+    LITE.df = df;
+    const N = LITE.chunks.length;
+    LITE.idf = Object.create(null);
+    for (const [t, n] of Object.entries(df)) {
+      LITE.idf[t] = Math.log(1 + (N - n + 0.5) / (n + 0.5));
+    }
+    LITE.ready = true;
+    return true;
+  } catch (e) {
+    console.warn("lite corpus unavailable:", e);
+    return false;
+  }
+}
+
+function liteSearch(query, k = 5) {
+  const terms = liteTokens(query);
+  const scores = new Float64Array(LITE.chunks.length);
+  for (const t of terms) {
+    const idf = LITE.idf[t];
+    if (idf === undefined) continue;
+    for (let i = 0; i < LITE.chunks.length; i++) {
+      const f = LITE.tf[i][t];
+      if (!f) continue;
+      const norm = LITE.k1 * (1 - LITE.b + LITE.b * LITE.dl[i] / LITE.avgdl);
+      scores[i] += idf * f * (LITE.k1 + 1) / (f + norm);
+    }
+  }
+  const order = [...scores.keys()].sort((a, b) => scores[b] - scores[a]);
+  // Collapse to unique parents, mirroring the server's Retriever.
+  const seen = new Set(), hits = [];
+  for (const i of order) {
+    if (scores[i] <= 0) break;
+    const c = LITE.chunks[i];
+    if (seen.has(c.d)) continue;
+    seen.add(c.d);
+    hits.push({ doc_id: c.d, title: c.t, url: c.u, score: scores[i],
+                context_text: LITE.parents[c.d] });
+    if (hits.length >= k) break;
+  }
+  const termHits = new Set(terms.filter((t) => LITE.idf[t] !== undefined)).size;
+  return { hits, termHits, nTerms: new Set(terms).size, top: hits[0]?.score || 0 };
+}
+
+/* Guardrails, ported. Same rules as app/rag/guardrails.py. */
+const LITE_IMPERATIVES = [
+  /^\s*(write|compose|draft)\s+(me\s+)?(a|an|some)\b/i,
+  /^\s*(book|order|buy|reserve)\s+(me\s+)?(a|an|my)\b/i,
+  /^\s*(translate|summarize|rewrite|refactor)\s+/i,
+  /^\s*(ignore|disregard|forget)\s+(all\s+)?(previous|prior|above)\b/i,
+  /^\s*(pretend|act as|roleplay|you are now)\b/i,
+];
+
+function liteAsk(query) {
+  const t0 = performance.now();
+  const guardrails = {};
+
+  const q = query.trim();
+  const scopeOk = q.length > 0 && q.length <= 500 &&
+                  !LITE_IMPERATIVES.some((re) => re.test(q));
+  guardrails.scope = { ok: scopeOk, reason: scopeOk ? "in_scope" : "out_of_scope_instruction" };
+  if (!scopeOk) return liteRefuse("out_of_scope_instruction", guardrails, t0, []);
+
+  const r = liteSearch(q);
+  const tRetrieve = performance.now();
+
+  const citations = r.hits.map((h) => ({
+    doc_id: h.doc_id, title: h.title, url: h.url, score: h.score,
+  }));
+
+  guardrails.vocabulary = {
+    ok: r.termHits > 0, term_hits: r.termHits, query_terms: r.nTerms,
+    reason: r.termHits > 0 ? "vocabulary_overlap" : "no_corpus_vocabulary",
+  };
+  if (!r.termHits) return liteRefuse("no_corpus_vocabulary", guardrails, t0, [], NO_VOCAB_TEXT_JS);
+
+  if (!r.hits.length) return liteRefuse("no_results", guardrails, t0, []);
+
+  /* NOTE: no score gate here. That threshold (0.8167) is a calibrated COSINE,
+     and BM25 scores live on a completely different, unbounded scale --
+     applying it would be meaningless. Lite mode therefore leans harder on the
+     vocabulary gate and on citations. Stated rather than silently skipped. */
+  guardrails.score = { ok: true, reason: "not_applicable_in_lite_mode" };
+
+  const answer = r.hits[0].context_text;
+  guardrails.groundedness = { ok: true, reason: "extractive_verbatim", checked: 0 };
+  guardrails.degraded = { reason: "lite_mode_no_api" };
+
+  const total = performance.now() - t0;
+  return {
+    answer, mode: "extractive", answered: true, citations, guardrails,
+    timings_ms: {
+      scope: 0.01,
+      retrieval_search: +(tRetrieve - t0).toFixed(3),
+      retrieval_total: +(tRetrieve - t0).toFixed(3),
+      groundedness: 0.01,
+      total: +total.toFixed(3),
+    },
+    _lite: true,
+  };
+}
+
+const NO_VOCAB_TEXT_JS =
+  "I couldn't match any of that to the Hacker House Goa material. My source is " +
+  "the English text of hhgoa.com, so questions in other languages won't match " +
+  "even when the answer is there. Try asking in English — for example, " +
+  '"when does registration begin".';
+
+const REFUSAL_TEXT_JS =
+  "I don't have that in the Hacker House Goa event information I can see. " +
+  "Try asking about dates, eligibility, the selection process, tasks, or the terms.";
+
+function liteRefuse(reason, guardrails, t0, citations, text) {
+  return {
+    answer: text || REFUSAL_TEXT_JS,
+    mode: "refused", answered: false, citations,
+    refusal_reason: reason, guardrails,
+    timings_ms: { total: +(performance.now() - t0).toFixed(3) },
+    _lite: true,
+  };
+}
+
 /* ---------------------------------------------------------------------- ask */
 async function ask(query) {
   if (!query || !query.trim()) return;
@@ -918,6 +1097,16 @@ async function ask(query) {
 
   const t0 = performance.now();
   let data;
+
+  // No API? Answer locally rather than failing. A working degraded demo beats
+  // a dead page, and every guardrail still runs.
+  if (apiOk === false && LITE.ready) {
+    data = liteAsk(query);
+    render(data, performance.now() - t0);
+    if (data.answered) speak(data.answer);
+    return;
+  }
+
   try {
     const headers = { "Content-Type": "application/json" };
     // Optional. Sent as a header, never a query param: a key in a URL leaks
@@ -960,7 +1149,16 @@ function render(d, roundTrip) {
 
   typewrite($("answer"), d.answer);
 
-  if (d.mode === "extractive") {
+  if (d._lite) {
+    show($("modeNote"),
+      "LITE MODE — answered entirely in your browser, with no backend. " +
+      "Ranking is BM25 lexical only: measured recall@5 0.865 and precision@1 " +
+      "0.649, against 0.919 / 0.703 for the full hybrid pipeline behind the " +
+      "API. The score gate is skipped too, because its threshold is a " +
+      "calibrated cosine and BM25 scores are on a different scale. Scope, " +
+      "vocabulary and citations are unchanged. Point the Setup panel at a " +
+      "running API for the real pipeline.");
+  } else if (d.mode === "extractive") {
     show($("modeNote"),
       /* Drive this from the server's OWN reason, not from whether the browser
          happens to hold a key. The server may carry its own key and have it
